@@ -35,8 +35,8 @@ The purpose of this class is to keep things as simple as possible, while account
   - [Like](#like)
   - [Where In Array](#where-in-array)
     - [With Other Placeholders](#with-other-placeholders)
-  - [Transactions](#change-the-ringtone)
-    - [Same Template, Different Values](same-template-different-values)
+  - [Transactions](#transactions)
+    - [Same Template, Different Values](#same-template-different-values)
 - [Documentation](#documentation)
   - [Constructor](#constructor)
   - [insert()](#insert-function)
@@ -52,7 +52,7 @@ Let's get straight to the point! The best way to learn is by examples.
 
 ## Create a New MySQL Connection
 
-One of the aspects of MySQLi I actually like a lot is the fact that error reporting is automatically turned off. Unfortunately I wasn't able to replicate this, as I throw an excpetion on the the constructor, therefore potentially exposing the parameter values. This is why I turned on mysqli reporting by doing `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)` — since you'll be wrapping it in a `try/catch` block anyway. So you must either wrap it around in a `try/catch` block or create your own custom handler. Make sure you use `$e->getMessage()` and not `$e` so your password isn't exposed. Either way, you must solely report your errors in your error log. To do this, make sure your `php.ini` file has the following settings in production. `display_errors = Off` and `log_errors = On` in your php.ini file.
+One of the aspects of MySQLi I actually like a lot is the fact that error reporting is automatically turned off. Unfortunately I wasn't able to replicate this, as I throw an excpetion on the the constructor, therefore potentially exposing the parameter values. This is why I turned on mysqli reporting by doing `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)` — since you'll be wrapping it in a `try/catch` block anyway. So you must either wrap it around in a `try/catch` block or create your own custom handler. Make sure you use `$e->getMessage()` and not `$e` so your password isn't exposed. Either way, you must solely report your errors in your error log. To do this, make sure your `php.ini` file has the following settings in production: `display_errors = Off` and `log_errors = On`.
 
 **Try/Catch**
 
@@ -316,7 +316,7 @@ void function transaction($sql, array $values, array $types = [])
 
 **Parameters**
 
-- **string $sql** - SQL query
+- **mixed $sql** - SQL query; can be array for different queries or a string for the same query with different values
 - **array $values** - values or variables to bind to query
 - **string $types = ''** (optional) - variable type for each bound values/variable
 
