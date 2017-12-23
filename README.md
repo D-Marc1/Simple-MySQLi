@@ -61,8 +61,8 @@ try {
   $typeRequired = false;
   $mysqli = new SimpleMySQLi("localhost", "username", "password", "dbName", $typeRequired, "utf8", "assoc");
 } catch(Exception $e) {
-  error_log($e->getMessage()); //use in production
-  exit('Someting weird happened'); //Should be a message a typical user could understand in production
+  error_log($e->getMessage());
+  exit('Someting weird happened'); //Should be a message a typical user could understand
 }
 ```
 
@@ -72,8 +72,8 @@ This is pretty neat, since you can avoid nesting. It is commonly used to redirec
 
 ```php
 set_exception_handler(function($e) {
-  error_log($e->getMessage()); //In production
-  exit('Someting weird happened'); //Should be a message a typical user could understand in production
+  error_log($e->getMessage());
+  exit('Someting weird happened'); //Should be a message a typical user could understand
 });
 $mysqli = new SimpleMySQLi("localhost", "username", "password", "dbName", $typeRequired, "utf8", "assoc");
 ```
@@ -181,7 +181,7 @@ $mysqli->transaction($sql, $arrOfValues);
 
 ## Error Handling
 
-Either wrap all your queries with one `try/catch` or use the `set_exception_handler()` function to either redirect to a global error page or a separate one for each page. Remember to not
+Either wrap all your queries with one `try/catch` or use the `set_exception_handler()` function to either redirect to a global error page or a separate one for each page. **Don't forget to take out echo in production**, as you obviously do not need the client to see this information.
 
 **Try/Catch**
 
@@ -190,8 +190,7 @@ Either wrap all your queries with one `try/catch` or use the `set_exception_hand
 try {
   $insert = $mysqli->insert("INSERT INTO myTable (name, age) VALUES (?, ?)", [$_POST['name'], $_POST['age']]);
 } catch (Exception $e) {
-  echo $e; //use in development
-  error_log($e); //use in production
+  error_log($e);
   exit('Error inserting');
 }
 ```
@@ -201,8 +200,7 @@ try {
 ```php
 //include mysqli_connect.php
 set_exception_handler(function($e) {
-  echo $e; //use in development
-  error_log($e); //use in production
+  error_log($e);
   exit('Error inserting');
 });
 $insert = $mysqli->insert("INSERT INTO myTable (name, age) VALUES (?, ?)", [$_POST['name'], $_POST['age']]);
