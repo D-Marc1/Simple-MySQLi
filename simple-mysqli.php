@@ -1,10 +1,10 @@
 <?php
 class SimpleMySQLi {
-  private $mysqli;
+	private $mysqli;
 	private $typeRequired;
 	private $defaultFetchType;
 	private $allowedFetchTypes = ['assoc', 'obj', 'num', 'singleRowAssoc', 'singleRowObj', 'singleRowNum'];
-  public function __construct(string $host, string $username, string $password, string $dbName, bool $typeRequired = true, string $charset = 'utf8', string $defaultFetchType = 'assoc') {
+	public function __construct(string $host, string $username, string $password, string $dbName, bool $typeRequired = true, string $charset = 'utf8', string $defaultFetchType = 'assoc') {
 		$this->typeRequired = $typeRequired;
 		$this->defaultFetchType = $defaultFetchType;
 		if(!in_array($defaultFetchType, $this->allowedFetchTypes)) { //check if it is an allowed fetch type
@@ -24,7 +24,7 @@ class SimpleMySQLi {
 		if($getInsertId) $insertId = $this->mysqli->insert_id;
 		$stmt->close();
 		if($getInsertId) return [$affectedRows, $insertId];
-    else return $affectedRows;
+		else return $affectedRows;
 	}
 	public function update(string $sql, array $values, string $types = '') {
 		if(!$this->typeRequired) $types = str_repeat('s', count($values));
@@ -33,7 +33,7 @@ class SimpleMySQLi {
 		$stmt->execute();
 		$affectedRows = $stmt->affected_rows;
 		$stmt->close();
-    return $affectedRows;
+		return $affectedRows;
 	}
 	public function delete(string $sql, array $values, string $types = '') {
 		if(!$this->typeRequired) $types = str_repeat('s', count($values));
@@ -67,7 +67,7 @@ class SimpleMySQLi {
 		}
 		else if($fetchType === 'num') $arr = $result->fetch_all(MYSQLI_NUM);
 		else $arr = $result->fetch_all(MYSQLI_ASSOC);
-    $stmt->close();
+		$stmt->close();
 		return $arr;
 	}
 	public function transaction($sql, array $values, array $types = []) {
