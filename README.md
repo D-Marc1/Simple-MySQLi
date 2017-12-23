@@ -52,7 +52,7 @@ Let's get straight to the point! The best way to learn is by examples.
 
 ## Create a New MySQL Connection
 
-One of the aspects of MySQLi I actually like a lot is the fact that error reporting is automatically turned off. Unfortunately I wasn't able to replicate this, as I throw an excpetion on the the constructor, therefore potentially exposing the parameter values. This is why I turned on mysqli reporting by doing `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)` — since you'll be wrapping it in a `try/catch` block anyway. So you must either wrap it around in a `try/catch` block or create your own custom handler. Make sure you use `$e->getMessage()` and not `$e` so your password isn't exposed. Either way, you must solely report your errors in your error log. To do this, make sure your `php.ini` file has the following settings in production: `display_errors = Off` and `log_errors = On`.
+One of the aspects of MySQLi I actually like a lot is the fact that error reporting is automatically turned off. Unfortunately I wasn't able to replicate this, as I throw an excpetion on the the constructor, therefore potentially exposing the parameter values. This is why I turned on mysqli reporting by doing `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)` — since you'll be wrapping it in a `try/catch` block anyway. So you must either wrap it around in a `try/catch` block or create your own custom handler. Make sure you use `$e->getMessage()` and not `$e` so your password isn't exposed. Either way, you must solely report your errors in your error log. To do this, make sure your `php.ini` file has the following settings in production: `display_errors = Off` and `log_errors = On`. Keep in mind that using `echo`, `die` or `exit` to print the error message is extremely dangerous as well.
 
 **Try/Catch**
 
@@ -61,7 +61,6 @@ try {
   $typeRequired = false;
   $mysqli = new SimpleMySQLi("localhost", "username", "password", "dbName", $typeRequired, "utf8", "assoc");
 } catch(Exception $e) {
-  echo $e->getMessage(); //use in development
   error_log($e->getMessage()); //use in production
   exit('Someting weird happened'); //Should be a message a typical user could understand in production
 }
@@ -73,7 +72,6 @@ This is pretty neat, since you can avoid nesting. It is commonly used to redirec
 
 ```php
 set_exception_handler(function($e) {
-  echo $e->getMessage(); //use in development
   error_log($e->getMessage()); //In production
   exit('Someting weird happened'); //Should be a message a typical user could understand in production
 });
@@ -183,11 +181,12 @@ $mysqli->transaction($sql, $arrOfValues);
 
 ## Error Handling
 
-Either wrap your whole page with a `try/catch` or use the `set_exception_handler()` function to either redirect to a global error page or a separate one for each page.
+Either wrap all your queries with one `try/catch` or use the `set_exception_handler()` function to either redirect to a global error page or a separate one for each page. Remember to not
 
 **Try/Catch**
 
 ```php
+//include mysqli_connect.php
 try {
   $insert = $mysqli->insert("INSERT INTO myTable (name, age) VALUES (?, ?)", [$_POST['name'], $_POST['age']]);
 } catch (Exception $e) {
@@ -200,6 +199,7 @@ try {
 **Custom Exception Handler**
 
 ```php
+//include mysqli_connect.php
 set_exception_handler(function($e) {
   echo $e; //use in development
   error_log($e); //use in production
