@@ -233,6 +233,7 @@ new SimpleMySQLi(string $host, string $username, string $password, string $dbNam
 **Throws**
 
 - Throws exception if `$defaultFetchType` specified isn't one of the allowed fetch modes
+- Throws exception with reason if any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
 
 ## Insert Function
 
@@ -252,6 +253,10 @@ mixed function insert(string $sql, array $values, bool $getAffectedRows = false,
 - **number of affected rows**
 - **an array with [affectedRows, insertId]** if `$getInsertId = true`
 
+**Throws**
+
+- Throws exception with reason if any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
+
 ## Update Function
 
 ```php
@@ -268,6 +273,10 @@ int function update(string $sql, array $values, bool $getAffectedRows = false, s
 
 - **number of affected rows**
 
+**Throws**
+
+- Throws exception with reason if any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
+
 ## Delete Function
 
 ```php
@@ -283,6 +292,10 @@ int function delete(string $sql, array $values, bool $getAffectedRows = false, s
 **Returns**
 
 - **number of affected rows**
+
+**Throws**
+
+- Throws exception with reason if any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
 
 ## Select Function
 
@@ -305,6 +318,7 @@ array function select(string $sql, array $values = [], string $fetchType = '', s
 **Throws**
 
 - Throws exception if `$fetchType` specified isn't one of the allowed fetch modes
+- Throws exception with reason if any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
 
 ## Transaction Function
 
@@ -321,6 +335,7 @@ void function transaction(mixed $sql, array $values, array $types = [])
 **Throws**
 
 - Throws exception if transaction fails
+- Throws exception with reason if any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
 
 ## Close Function
 
