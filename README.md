@@ -238,7 +238,7 @@ new SimpleMySQLi(string $host, string $username, string $password, string $dbNam
 ## Insert Function
 
 ```php
-mixed function insert(string $sql, array $values, bool $getAffectedRows = false, bool $getInsertId = false, string $types = '')
+mixed function insert(string $sql, array $values, bool $getInsertId = false, string $types = '')
 ```
 
 **Parameters**
@@ -260,7 +260,7 @@ mixed function insert(string $sql, array $values, bool $getAffectedRows = false,
 ## Update Function
 
 ```php
-int function update(string $sql, array $values, bool $getAffectedRows = false, string $types = '')
+int function update(string $sql, array $values, string $types = '')
 ```
 
 **Parameters**
@@ -280,7 +280,7 @@ int function update(string $sql, array $values, bool $getAffectedRows = false, s
 ## Delete Function
 
 ```php
-int function delete(string $sql, array $values, bool $getAffectedRows = false, string $types = '')
+int function delete(string $sql, array $values, string $types = '')
 ```
 
 **Parameters**
