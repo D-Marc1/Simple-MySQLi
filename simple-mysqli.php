@@ -45,6 +45,7 @@ class SimpleMySQLi {
 		return $affectedRows;
 	}
 	public function select(string $sql, array $values = [], string $fetchType = '', string $types = '') {
+		$arr = [];
 		if(!$fetchType) $fetchType = $this->defaultFetchType;
 		if(!in_array($fetchType, $this->allowedFetchTypes)) { //check if it is an allowed fetch type
 			$allowedComma = implode(', ',$this->allowedFetchTypes);
@@ -55,10 +56,8 @@ class SimpleMySQLi {
 		if($values) $stmt->bind_param($types, ...$values);
 		$stmt->execute();
 		$result = $stmt->get_result();
-		$numRows = $result->num_rows;
-		if($numRows === 0) $arr = 0; //misleading, since not array, but will give the return value 0
-		else if($fetchType === 'singleRowNum') $arr = $result->fetch_all(MYSQLI_NUM)[0];
-		else if($fetchType === 'singleRowAssoc') $arr = $result->fetch_all(MYSQLI_ASSOC)[0];
+		if($fetchType === 'singleRowNum') $arr = $result->fetch_row();
+		else if($fetchType === 'singleRowAssoc') $arr = $result->fetch_assoc();
 		else if($fetchType === 'singleRowObj') $arr = $result->fetch_object();
 		else if($fetchType === 'obj') {
 			while($row = $result->fetch_object()) {
@@ -68,7 +67,7 @@ class SimpleMySQLi {
 		else if($fetchType === 'num') $arr = $result->fetch_all(MYSQLI_NUM);
 		else $arr = $result->fetch_all(MYSQLI_ASSOC);
 		$stmt->close();
-		return $arr;
+		return ($arr ?: []); //account for single row fetching, since those functions return null, not empty array
 	}
 	public function transaction($sql, array $values, array $types = []) {
 		try {

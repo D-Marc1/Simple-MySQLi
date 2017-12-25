@@ -287,7 +287,7 @@ int function delete(string $sql, array $values, bool $getAffectedRows = false, s
 ## Select Function
 
 ```php
-mixed function select(string $sql, array $values = [], string $fetchType = '', string $types = '')
+array function select(string $sql, array $values = [], string $fetchType = '', string $types = '')
 ```
 
 **Parameters**
@@ -300,7 +300,7 @@ mixed function select(string $sql, array $values = [], string $fetchType = '', s
 **Returns**
 
 - **Array of `$fetchType` specified**
-- **0** if select yields 0 rows
+- **[]** if select yields 0 rows
 
 **Throws**
 
@@ -309,7 +309,7 @@ mixed function select(string $sql, array $values = [], string $fetchType = '', s
 ## Transaction Function
 
 ```php
-void function transaction($sql, array $values, array $types = [])
+void function transaction(mixed $sql, array $values, array $types = [])
 ```
 
 **Parameters**
