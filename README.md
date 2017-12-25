@@ -245,7 +245,7 @@ mixed function insert(string $sql, array $values, bool $getInsertId = false, str
 
 - **string $sql** - SQL query
 - **array $values** - values or variables to bind to query
-- **bool $getInsertId = false** (optional) - if true, returns the primary key of the latest inserted rows
+- **bool $getInsertId = false** (optional) - if true, returns the primary key of the latest inserted rows in an array with [affectedRows, insertId]
 - **string $types = ''** (optional) - variable type for each bound values/variable
 
 **Returns**
