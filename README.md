@@ -62,7 +62,7 @@ One of the aspects of MySQLi I actually like a lot is the fact that error report
 
 ```php
 try {
-  $typeRequired = false;
+  $typeRequired = false; //Doesn't enforce specify types and will treat everything as a string
   $mysqli = new SimpleMySQLi("localhost", "username", "password", "dbName", $typeRequired, "utf8", "assoc");
 } catch(Exception $e) {
   error_log($e->getMessage());
@@ -85,20 +85,24 @@ $mysqli = new SimpleMySQLi("localhost", "username", "password", "dbName", $typeR
 ## Insert
 
 ```php
-$insert = $mysqli->insert("INSERT INTO myTable (name, age) VALUES (?, ?)", [$_POST['name'], $_POST['age']]);
+//returns $stmt->affected_rows by default; if set to true, then it will print array with $mysqli->insert_id too
+$insert = $mysqli->insert("INSERT INTO myTable (name, age) VALUES (?, ?)", [$_POST['name'], $_POST['age']], true);
+echo $insert[0];
+echo $insert[1];
 ```
 
 ## Update
 
 ```php
-$insert = $mysqli->update("UPDATE myTable SET name = ? WHERE id = ?", [$_POST['name'], $_SESSION['id']]);
-echo $insert; //is the value of $stmt->affected_rows
+$update = $mysqli->update("UPDATE myTable SET name = ? WHERE id = ?", [$_POST['name'], $_SESSION['id']]);
+echo $update; //is the value of $stmt->affected_rows
 ```
 
 ## Delete
 
 ```php
-$insert = $mysqli->delete("DELETE FROM myTable WHERE id = ?", [$_SESSION['id']]);
+$delete = $mysqli->delete("DELETE FROM myTable WHERE id = ?", [$_SESSION['id']]);
+echo $delete; //is the value of $stmt->affected_rows
 ```
 
 ## Select
