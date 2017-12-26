@@ -85,6 +85,11 @@ $mysqli = new SimpleMySQLi("localhost", "username", "password", "dbName", $typeR
 ## Insert
 
 ```php
+$insert = $mysqli->insert("INSERT INTO myTable (name, age) VALUES (?, ?)", [$_POST['name'], $_POST['age']]);
+echo $insert; //is the value of $stmt->affected_rows
+```
+
+```php
 //returns $stmt->affected_rows by default; if set to true, then it will print object with $mysqli->insert_id too
 $insert = $mysqli->insert("INSERT INTO myTable (name, age) VALUES (?, ?)", [$_POST['name'], $_POST['age']], true);
 echo $insert->affected_rows;
@@ -259,7 +264,7 @@ function insert(string $sql, array $values, bool $getInsertId = false, string $t
 **Returns**
 
 - **number of affected rows**
-- **an object with $insert->affected_row and $insert->insert_id;** if `$getInsertId = true`
+- **an object with $insert->affected_row and $insert->insert_id** if `$getInsertId = true`
 
 **Throws**
 
