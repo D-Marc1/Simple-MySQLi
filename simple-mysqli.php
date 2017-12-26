@@ -24,7 +24,7 @@ class SimpleMySQLi {
 		if($getInsertId) $insertId = $this->mysqli->insert_id;
 		$stmt->close();
 		if($getInsertId) return (object)['affected_rows' => $affectedRows, 'insert_id' => $insertId];
-		else return $affectedRows;
+		else return (object)['affected_rows' => $affectedRows];
 	}
 	public function update(string $sql, array $values, string $types = '') {
 		if(!$this->typeRequired) $types = str_repeat('s', count($values));
@@ -33,16 +33,10 @@ class SimpleMySQLi {
 		$stmt->execute();
 		$affectedRows = $stmt->affected_rows;
 		$stmt->close();
-		return $affectedRows;
+		return (object)['affected_rows' => $affectedRows];
 	}
 	public function delete(string $sql, array $values, string $types = '') {
-		if(!$this->typeRequired) $types = str_repeat('s', count($values));
-		$stmt = $this->mysqli->prepare($sql);
-		$stmt->bind_param($types, ...$values);
-		$stmt->execute();
-		$affectedRows = $stmt->affected_rows;
-		$stmt->close();
-		return $affectedRows;
+		$this->update($sql, $values, $types);
 	}
 	public function select(string $sql, array $values = [], string $fetchType = '', string $types = '') {
 		$arr = [];
@@ -56,6 +50,7 @@ class SimpleMySQLi {
 		if($values) $stmt->bind_param($types, ...$values);
 		$stmt->execute();
 		$result = $stmt->get_result();
+		//All of the fetch types
 		if($fetchType === 'singleRowNum') $arr = $result->fetch_row();
 		else if($fetchType === 'singleRowAssoc') $arr = $result->fetch_assoc();
 		else if($fetchType === 'singleRowObj') $arr = $result->fetch_object();
@@ -74,7 +69,7 @@ class SimpleMySQLi {
 			$this->mysqli->autocommit(FALSE);
 			for($x = 0; $x < count($values); $x++) {
 				if(!$this->typeRequired) $types[$x] = str_repeat('s', count($values[$x]));
-				$daSql = (!is_array($sql) ? $sql : $sql[$x]);
+				$daSql = (!is_array($sql) ? $sql : $sql[$x]); //Either different queries or the same one with different values
 				$stmt = $this->mysqli->prepare($daSql);
 				$stmt->bind_param($types[$x], ...$values[$x]);
 				$stmt->execute();

@@ -86,7 +86,7 @@ $mysqli = new SimpleMySQLi("localhost", "username", "password", "dbName", $typeR
 
 ```php
 $insert = $mysqli->insert("INSERT INTO myTable (name, age) VALUES (?, ?)", [$_POST['name'], $_POST['age']]);
-echo $insert; //is the value of $stmt->affected_rows
+echo $insert->affected_rows;
 ```
 
 ```php
@@ -100,14 +100,14 @@ echo $insert->insert_id;
 
 ```php
 $update = $mysqli->update("UPDATE myTable SET name = ? WHERE id = ?", [$_POST['name'], $_SESSION['id']]);
-echo $update; //is the value of $stmt->affected_rows
+echo $update->affected_rows;
 ```
 
 ## Delete
 
 ```php
 $delete = $mysqli->delete("DELETE FROM myTable WHERE id = ?", [$_SESSION['id']]);
-echo $delete; //is the value of $stmt->affected_rows
+echo $delete->affected_rows;
 ```
 
 ## Select
@@ -263,8 +263,8 @@ function insert(string $sql, array $values, bool $getInsertId = false, string $t
 
 **Returns**
 
-- **number of affected rows**
-- **an object with $insert->affected_row and $insert->insert_id** if `$getInsertId = true`
+- **an object that can be called with $insert->affected_row**
+- **an object that can be called $insert->affected_row and $insert->insert_id** if `$getInsertId = true`
 
 **Throws**
 
@@ -284,7 +284,7 @@ function update(string $sql, array $values, string $types = '')
 
 **Returns**
 
-- **number of affected rows**
+- **an object that can be called with $insert->affected_row**
 
 **Throws**
 
@@ -304,7 +304,7 @@ function delete(string $sql, array $values, string $types = '')
 
 **Returns**
 
-- **number of affected rows**
+- **an object that can be called with $insert->affected_row**
 
 **Throws**
 
