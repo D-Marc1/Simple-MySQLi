@@ -284,7 +284,7 @@ function update(string $sql, array $values, string $types = '')
 
 **Returns**
 
-- **an object that can be called with $insert->affected_row**
+- **an object that can be called with $update->affected_row**
 
 **Throws**
 
@@ -304,7 +304,7 @@ function delete(string $sql, array $values, string $types = '')
 
 **Returns**
 
-- **an object that can be called with $insert->affected_row**
+- **an object that can be called with $delete->affected_row**
 
 **Throws**
 
