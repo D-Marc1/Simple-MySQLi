@@ -21,6 +21,10 @@ On a side note, if you'd like to know how to use MySQLi the "vanilla way", check
 
 The purpose of this class is to keep things as simple as possible, while accounting for the most common uses. If there's something you'd like me to add, feel free to suggest it or send a pull request.
 
+# Supported Versions
+
+PHP 7.0+
+
 # Table of Contents
 
 - [Examples](#examples)
@@ -238,7 +242,7 @@ new SimpleMySQLi(string $host, string $username, string $password, string $dbNam
 ## Insert Function
 
 ```php
-mixed function insert(string $sql, array $values, bool $getInsertId = false, string $types = '')
+function insert(string $sql, array $values, bool $getInsertId = false, string $types = '')
 ```
 
 **Parameters**
@@ -260,7 +264,7 @@ mixed function insert(string $sql, array $values, bool $getInsertId = false, str
 ## Update Function
 
 ```php
-int function update(string $sql, array $values, string $types = '')
+function update(string $sql, array $values, string $types = '')
 ```
 
 **Parameters**
@@ -280,7 +284,7 @@ int function update(string $sql, array $values, string $types = '')
 ## Delete Function
 
 ```php
-int function delete(string $sql, array $values, string $types = '')
+function delete(string $sql, array $values, string $types = '')
 ```
 
 **Parameters**
@@ -300,7 +304,7 @@ int function delete(string $sql, array $values, string $types = '')
 ## Select Function
 
 ```php
-array function select(string $sql, array $values = [], string $fetchType = '', string $types = '')
+function select(string $sql, array $values = [], string $fetchType = '', string $types = '')
 ```
 
 **Parameters**
@@ -323,7 +327,7 @@ array function select(string $sql, array $values = [], string $fetchType = '', s
 ## Transaction Function
 
 ```php
-void function transaction(mixed $sql, array $values, array $types = [])
+function transaction(mixed $sql, array $values, array $types = [])
 ```
 
 **Parameters**
@@ -340,7 +344,7 @@ void function transaction(mixed $sql, array $values, array $types = [])
 ## Close Function
 
 ```php
-void function close()
+function close()
 ```
 
 **Description**
