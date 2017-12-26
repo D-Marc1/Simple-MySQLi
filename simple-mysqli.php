@@ -23,7 +23,7 @@ class SimpleMySQLi {
 		$affectedRows = $stmt->affected_rows;
 		if($getInsertId) $insertId = $this->mysqli->insert_id;
 		$stmt->close();
-		if($getInsertId) return [$affectedRows, $insertId];
+		if($getInsertId) return (object)['affected_rows' => $affectedRows, 'insert_id' => $insertId];
 		else return $affectedRows;
 	}
 	public function update(string $sql, array $values, string $types = '') {

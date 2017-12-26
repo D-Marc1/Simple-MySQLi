@@ -62,7 +62,7 @@ One of the aspects of MySQLi I actually like a lot is the fact that error report
 
 ```php
 try {
-  $typeRequired = false; //Doesn't enforce specify types and will treat everything as a string
+  $typeRequired = false; //Doesn't enforce specifying types and will treat everything as a string
   $mysqli = new SimpleMySQLi("localhost", "username", "password", "dbName", $typeRequired, "utf8", "assoc");
 } catch(Exception $e) {
   error_log($e->getMessage());
@@ -85,10 +85,10 @@ $mysqli = new SimpleMySQLi("localhost", "username", "password", "dbName", $typeR
 ## Insert
 
 ```php
-//returns $stmt->affected_rows by default; if set to true, then it will print array with $mysqli->insert_id too
+//returns $stmt->affected_rows by default; if set to true, then it will print object with $mysqli->insert_id too
 $insert = $mysqli->insert("INSERT INTO myTable (name, age) VALUES (?, ?)", [$_POST['name'], $_POST['age']], true);
-echo $insert[0];
-echo $insert[1];
+echo $insert->affected_rows;
+echo $insert->insert_id;
 ```
 
 ## Update
@@ -253,13 +253,13 @@ function insert(string $sql, array $values, bool $getInsertId = false, string $t
 
 - **string $sql** - SQL query
 - **array $values** - values or variables to bind to query
-- **bool $getInsertId = false** (optional) - if true, returns the primary key of the latest inserted rows in an array with [affectedRows, insertId]
+- **bool $getInsertId = false** (optional) - if true, returns the primary key of the latest inserted rows in an object with affectedRows and insertId
 - **string $types = ''** (optional) - variable type for each bound values/variable
 
 **Returns**
 
 - **number of affected rows**
-- **an array with [affectedRows, insertId]** if `$getInsertId = true`
+- **an object with $insert->affected_row and $insert->insert_id;** if `$getInsertId = true`
 
 **Throws**
 
