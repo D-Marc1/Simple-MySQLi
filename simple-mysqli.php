@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class SimpleMySQLi
+ */
 class SimpleMySQLi
 {
     private $mysqli;
@@ -36,7 +39,7 @@ class SimpleMySQLi
      * @param array $values
      * @param bool $getInsertId
      * @param string $types
-     * @return int|object
+     * @return object
      */
     public function insert(string $sql, array $values, bool $getInsertId = false, string $types = '')
     {
@@ -47,7 +50,6 @@ class SimpleMySQLi
         $stmt->bind_param($types, ...$values);
         $stmt->execute();
         $affectedRows = $stmt->affected_rows;
-        $insertId = null;
         if ($getInsertId) {
             $insertId = $this->mysqli->insert_id;
         }
@@ -55,7 +57,7 @@ class SimpleMySQLi
         if ($getInsertId) {
             return (object)['affected_rows' => $affectedRows, 'insert_id' => $insertId];
         } else {
-            return $affectedRows;
+            return (object)['affected_rows' => $affectedRows];
         }
     }
 
@@ -63,7 +65,7 @@ class SimpleMySQLi
      * @param string $sql
      * @param array $values
      * @param string $types
-     * @return int
+     * @return object
      */
     public function update(string $sql, array $values, string $types = '')
     {
@@ -76,27 +78,17 @@ class SimpleMySQLi
         $affectedRows = $stmt->affected_rows;
         $stmt->close();
 
-        return $affectedRows;
+        return (object)['affected_rows' => $affectedRows];
     }
 
     /**
      * @param string $sql
      * @param array $values
      * @param string $types
-     * @return int
      */
     public function delete(string $sql, array $values, string $types = '')
     {
-        if (!$this->typeRequired) {
-            $types = str_repeat('s', count($values));
-        }
-        $stmt = $this->mysqli->prepare($sql);
-        $stmt->bind_param($types, ...$values);
-        $stmt->execute();
-        $affectedRows = $stmt->affected_rows;
-        $stmt->close();
-
-        return $affectedRows;
+        $this->update($sql, $values, $types);
     }
 
     /**
@@ -126,6 +118,7 @@ class SimpleMySQLi
         }
         $stmt->execute();
         $result = $stmt->get_result();
+        //All of the fetch types
         if ($fetchType === 'singleRowNum') {
             $arr = $result->fetch_row();
         } else {
@@ -168,7 +161,7 @@ class SimpleMySQLi
                 if (!$this->typeRequired) {
                     $types[$x] = str_repeat('s', count($values[$x]));
                 }
-                $daSql = (!is_array($sql) ? $sql : $sql[$x]);
+                $daSql = (!is_array($sql) ? $sql : $sql[$x]); //Either different queries or the same one with different values
                 $stmt = $this->mysqli->prepare($daSql);
                 $stmt->bind_param($types[$x], ...$values[$x]);
                 $stmt->execute();
