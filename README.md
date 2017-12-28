@@ -263,8 +263,8 @@ function insert(string $sql, array $values, bool $getInsertId = false, string $t
 
 **Returns**
 
-- **an object that can be called with $insert->affected_row**
-- **an object that can be called $insert->affected_row and $insert->insert_id** if `$getInsertId = true`
+- **an object that can be called with $insert->affected_rows**
+- **an object that can be called $insert->affected_rows and $insert->insert_id** if `$getInsertId = true`
 
 **Throws**
 
@@ -284,7 +284,7 @@ function update(string $sql, array $values, string $types = '')
 
 **Returns**
 
-- **an object that can be called with $update->affected_row**
+- **an object that can be called with $update->affected_rows**
 
 **Throws**
 
@@ -304,7 +304,7 @@ function delete(string $sql, array $values, string $types = '')
 
 **Returns**
 
-- **an object that can be called with $delete->affected_row**
+- **an object that can be called with $delete->affected_rows**
 
 **Throws**
 
