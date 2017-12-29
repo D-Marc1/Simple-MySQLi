@@ -9,22 +9,22 @@ class SimpleMySQLi {
 	private const $allowedFetchTypes = ['assoc', 'obj', 'num', 'singleRowAssoc', 'singleRowObj', 'singleRowNum'];
 
 	/**
-   * SimpleMySQLi constructor
-   * @param string $host Hostname or an IP address, like localhost or 127.0.0.1
-   * @param string $username Database username
-   * @param string $password Database password
-   * @param string $dbName Database name
-   * @param string $charset (optional) Default character encoding
-   * @param string $defaultFetchType (optional) Default fetch type. Can be:
+	 * SimpleMySQLi constructor
+	 * @param string $host Hostname or an IP address, like localhost or 127.0.0.1
+	 * @param string $username Database username
+	 * @param string $password Database password
+	 * @param string $dbName Database name
+	 * @param string $charset (optional) Default character encoding
+	 * @param string $defaultFetchType (optional) Default fetch type. Can be:
 	 *               'assoc' - associative array
 	 *               'obj' - object array
 	 *               'num' - number array
 	 *               'singleRowAssoc' - single row with associative keys
 	 *               'singleRowObj' - single row as object
 	 *               'singleRowNum' - single row with numbers
-   * @throws Exception If $defaultFetchType specified isn't one of the allowed fetch modes
+	 * @throws Exception If $defaultFetchType specified isn't one of the allowed fetch modes
 	 * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
-   */
+	 */
 	public function __construct(string $host, string $username, string $password, string $dbName, string $charset = 'utf8', string $defaultFetchType = 'assoc') {
 		$this->defaultFetchType = $defaultFetchType;
 
@@ -38,14 +38,14 @@ class SimpleMySQLi {
 		$this->mysqli->set_charset($charset);
 	}
 
-  /**
-   * @param string $sql SQL query
-   * @param array $values Values or variables to bind to query
-   * @param bool $getInsertId (optional) Returns the latest primary key in object if true
-   * @param string $types (optional) Variable type for each bound value/variable
-   * @return object Only affected rows by default. If $getInsertId is true, then also the latest primary key
-   * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
-   */
+	/**
+	 * @param string $sql SQL query
+	 * @param array $values Values or variables to bind to query
+	 * @param bool $getInsertId (optional) Returns the latest primary key in object if true
+	 * @param string $types (optional) Variable type for each bound value/variable
+	 * @return object Only affected rows by default. If $getInsertId is true, then also the latest primary key
+	 * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
+	 */
 	public function insert(string $sql, array $values, bool $getInsertId = false, string $types = '') {
 		if(!$types) $types = str_repeat('s', count($values)); //String type for all variables if not specified
 
@@ -60,13 +60,13 @@ class SimpleMySQLi {
 		else return (object)['affected_rows' => $affectedRows];
 	}
 
-  /**
-   * @param string $sql SQL query
-   * @param array $values Values or variables to bind to query
-   * @param string $types (optional) Variable type for each bound value/variable
-   * @return object Affected rows
-   * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
-   */
+	/**
+	 * @param string $sql SQL query
+	 * @param array $values Values or variables to bind to query
+	 * @param string $types (optional) Variable type for each bound value/variable
+	 * @return object Affected rows
+	 * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
+	 */
 	public function update(string $sql, array $values, string $types = '') {
 		if(!$types) $types = str_repeat('s', count($values)); //String type for all variables if not specified
 
@@ -79,26 +79,26 @@ class SimpleMySQLi {
 		return (object)['affected_rows' => $affectedRows];
 	}
 
-  /**
-   * Both update() and delete() are exactly the same.
-   * @param string $sql SQL query
-   * @param array $values Values or variables to bind to query
-   * @param string $types (optional) Variable type for each bound value/variable
-   * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
-   */
+	/**
+	 * Both update() and delete() are exactly the same.
+	 * @param string $sql SQL query
+	 * @param array $values Values or variables to bind to query
+	 * @param string $types (optional) Variable type for each bound value/variable
+	 * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
+	 */
 	public function delete(string $sql, array $values, string $types = '') {
 		$this->update($sql, $values, $types);
 	}
 
-  /**
-   * @param string $sql SQL query
-   * @param array $values (optional) Values or variables to bind to query. Can be empty for selecting all rows
-   * @param string $fetchType (optional) This overrides the default fetch type set in the constructor
-   * @param string $types (optional) Variable type for each bound value/variable
-   * @return array Either fetch type specified or default fetch mode
-   * @throws Exception If $fetchType specified isn't one of the allowed fetch modes in $defaultFetchType
-   * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
-   */
+	/**
+	 * @param string $sql SQL query
+	 * @param array $values (optional) Values or variables to bind to query. Can be empty for selecting all rows
+	 * @param string $fetchType (optional) This overrides the default fetch type set in the constructor
+	 * @param string $types (optional) Variable type for each bound value/variable
+	 * @return array Either fetch type specified or default fetch mode
+	 * @throws Exception If $fetchType specified isn't one of the allowed fetch modes in $defaultFetchType
+	 * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
+	 */
 	public function select(string $sql, array $values = [], string $fetchType = '', string $types = '') {
 		$arr = [];
 
@@ -129,13 +129,13 @@ class SimpleMySQLi {
 		return ($arr ?: []); //account for single row fetching, since those functions return null, not empty array
 	}
 
-  /**
-   * @param array|string $sql SQL query. Can be array for different queries or a string for the same query with different values
-   * @param array $values Values or variables to bind to query
-   * @param array $types (optional) Variable type for each bound value/variable
-   * @throws Exception If transaction fails
-   * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
-   */
+	/**
+	 * @param array|string $sql SQL query. Can be array for different queries or a string for the same query with different values
+	 * @param array $values Values or variables to bind to query
+	 * @param array $types (optional) Variable type for each bound value/variable
+	 * @throws Exception If transaction fails
+	 * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
+	 */
 	public function transaction($sql, array $values, array $types = []) {
 		try {
 			$this->mysqli->autocommit(FALSE);
@@ -155,10 +155,10 @@ class SimpleMySQLi {
 		}
 	}
 
-  /**
-   * Closes MySQL connection
-   * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
-   */
+	/**
+	 * Closes MySQL connection
+	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
+	 */
 	public function close() {
 		$this->mysqli->close();
 	}
