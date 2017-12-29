@@ -62,8 +62,7 @@ One of the aspects of MySQLi I actually like a lot is the fact that error report
 
 ```php
 try {
-  $typeRequired = false; //Doesn't enforce specifying types and will treat everything as a string
-  $mysqli = new SimpleMySQLi("localhost", "username", "password", "dbName", $typeRequired, "utf8", "assoc");
+  $mysqli = new SimpleMySQLi("localhost", "username", "password", "dbName", "utf8", "assoc");
 } catch(Exception $e) {
   error_log($e->getMessage());
   exit('Someting weird happened'); //Should be a message a typical user could understand
@@ -79,7 +78,7 @@ set_exception_handler(function($e) {
   error_log($e->getMessage());
   exit('Someting weird happened'); //Should be a message a typical user could understand
 });
-$mysqli = new SimpleMySQLi("localhost", "username", "password", "dbName", $typeRequired, "utf8", "assoc");
+$mysqli = new SimpleMySQLi("localhost", "username", "password", "dbName", "utf8", "assoc");
 ```
 
 ## Insert
@@ -224,7 +223,7 @@ $insert = $mysqli->insert("INSERT INTO myTable (name, age) VALUES (?, ?)", [$_PO
 ## Constructor
 
 ```php
-new SimpleMySQLi(string $host, string $username, string $password, string $dbName, bool $typeRequired = true, string $charset = 'utf8', string $defaultFetchType = 'assoc')
+new SimpleMySQLi(string $host, string $username, string $password, string $dbName, string $charset = 'utf8', string $defaultFetchType = 'assoc')
 ```
 
 **Parameters**
@@ -233,7 +232,6 @@ new SimpleMySQLi(string $host, string $username, string $password, string $dbNam
 - **string $username** - database username
 - **string $password** - database password
 - **string $dbName** - database name
-- **bool $typeRequired = true** (optional) - true/false if variable type is required to be specified. If false, it will treat everything as a string
 - **string $charset = 'utf8'** (optional) - default character encoding
 - **string defaultFetchType = 'assoc'** (optional) - default fetch type. Can be:
   - **'assoc'** - associative array
@@ -259,7 +257,7 @@ function insert(string $sql, array $values, bool $getInsertId = false, string $t
 - **string $sql** - SQL query
 - **array $values** - values or variables to bind to query
 - **bool $getInsertId = false** (optional) - if true, returns the primary key of the latest inserted rows in an object with affectedRows and insertId
-- **string $types = ''** (optional) - variable type for each bound values/variable
+- **string $types = ''** (optional) - variable type for each bound value/variable
 
 **Returns**
 
@@ -280,7 +278,7 @@ function update(string $sql, array $values, string $types = '')
 
 - **string $sql** - SQL query
 - **array $values** - values or variables to bind to query
-- **string $types = ''** (optional) - variable type for each bound values/variable
+- **string $types = ''** (optional) - variable type for each bound value/variable
 
 **Returns**
 
@@ -300,7 +298,7 @@ function delete(string $sql, array $values, string $types = '')
 
 - **string $sql** - SQL query
 - **array $values** - values or variables to bind to query
-- **string $types = ''** (optional) - variable type for each bound values/variable
+- **string $types = ''** (optional) - variable type for each bound value/variable
 
 **Returns**
 
@@ -321,7 +319,7 @@ function select(string $sql, array $values = [], string $fetchType = '', string 
 - **string $sql** - SQL query
 - **array $values = []** (optional) - values or variables to bind to query; can be empty for selecting all rows
 - **string $fetchType = ''** (optional) - This overrides the default fetch type set in the constructor. Check [here](#constructor) for possible values
-- **string $types = ''** (optional) - variable type for each bound values/variable
+- **string $types = ''** (optional) - variable type for each bound value/variable
 
 **Returns**
 
@@ -343,7 +341,7 @@ function transaction(mixed $sql, array $values, array $types = [])
 
 - **mixed $sql** - SQL query; can be array for different queries or a string for the same query with different values
 - **array $values** - values or variables to bind to query
-- **string $types = ''** (optional) - variable type for each bound values/variable
+- **string $types = ''** (optional) - variable type for each bound value/variable
 
 **Throws**
 
