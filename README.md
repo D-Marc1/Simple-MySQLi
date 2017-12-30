@@ -115,34 +115,44 @@ echo $delete->affected_rows;
 
 ```php
 $arr = $mysqli->select("SELECT name, email, number FROM events WHERE id <= ?", [$_SESSION['id']]);
+if(!$arr) exit('No rows');
 $names = array_column($arr, 'name');
 $emails = array_column($arr, 'email');
 $numbers = array_column($arr, 'number');
+print_r($names);
 ```
 
 ### Fetch Associative Array
 
 ```php
 $arr = $mysqli->select("SELECT id, name, age FROM events WHERE id <= ?", [4], 'assoc'); //not necessary to specify 'assoc' if default fetch type
+if(!$arr) exit('No rows');
+print_r($arr);
 ```
 
 ### Fetch Single Row
 
 ```php
 $arr = $mysqli->select("SELECT id, name, age FROM events WHERE id <= ?", [12], 'singleRowAssoc'); //not necessary to specify 'singleRowAssoc' if default fetch type
+if(!$arr) exit('No rows');
+print_r($arr);
 ```
 
 ### Fetch Single Row Like bind_result()
 
 ```php
 $arr = $mysqli->select("SELECT id, name, age FROM myTable WHERE name = ?", [$_POST['name']], 'singleRowNum'); //must use number array to use in list
+if(!$arr) exit('No rows');
 list($id, $name, $age) = $arr;
+echo $age;
 ```
 
 ### Fetch Array of Objects
 
 ```php
 $arr = $mysqli->select("SELECT id, name, age FROM events WHERE id <= ?", [4], 'obj'); //not necessary to specify 'obj' if default fetch type
+if(!$arr) exit('No rows');
+print_r($arr);
 ```
 
 ## Like
@@ -150,6 +160,8 @@ $arr = $mysqli->select("SELECT id, name, age FROM events WHERE id <= ?", [4], 'o
 ```php
 $search = "%{$_POST['search']}%";
 $arr = $mysqli->select("SELECT id, name, age FROM events WHERE name LIKE ?", [$search]);
+if(!$arr) exit('No rows');
+print_r($arr);
 ```
 
 ## Where In Array
@@ -158,6 +170,8 @@ $arr = $mysqli->select("SELECT id, name, age FROM events WHERE name LIKE ?", [$s
 $inArr = [12, 23, 44];
 $clause = implode(',', array_fill(0, count($inArr), '?'));
 $arr = $mysqli->select("SELECT event_name, description, location FROM events WHERE id IN($clause)", $inArr);
+if(!$arr) exit('No rows');
+print_r($arr);
 ```
 
 ### With Other Placeholders
@@ -167,6 +181,8 @@ $inArr = [12, 23, 44];
 $clause = implode(',', array_fill(0, count($inArr), '?'));
 $fullArr = array_merge($inArr, [5]);
 $arr = $mysqli->select("SELECT event_name, description, location FROM events WHERE id IN($clause) AND id < ?", $fullArr);
+if(!$arr) exit('No rows');
+print_r($arr);
 ```
 
 ## Transactions
