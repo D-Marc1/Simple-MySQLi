@@ -6,7 +6,7 @@
 class SimpleMySQLi {
 	private $mysqli;
 	private $defaultFetchType;
-	private const $allowedFetchTypes = ['assoc', 'obj', 'num', 'singleRowAssoc', 'singleRowObj', 'singleRowNum'];
+	private const ALLOWED_FETCH_TYPES = ['assoc', 'obj', 'num', 'singleRowAssoc', 'singleRowObj', 'singleRowNum'];
 
 	/**
 	 * SimpleMySQLi constructor
@@ -28,8 +28,8 @@ class SimpleMySQLi {
 	public function __construct(string $host, string $username, string $password, string $dbName, string $charset = 'utf8', string $defaultFetchType = 'assoc') {
 		$this->defaultFetchType = $defaultFetchType;
 
-		if(!in_array($defaultFetchType, $this->allowedFetchTypes)) { //check if it is an allowed fetch type
-			$allowedComma = implode(', ',$this->allowedFetchTypes);
+		if(!in_array($defaultFetchType, self::ALLOWED_FETCH_TYPES)) { //check if it is an allowed fetch type
+			$allowedComma = implode(', ',self::ALLOWED_FETCH_TYPES);
 			throw new Exception("The variable 'defaultFetchType' must be $allowedComma. You entered $defaultFetchType.");
 		}
 
@@ -103,8 +103,8 @@ class SimpleMySQLi {
 		$arr = [];
 
 		if(!$fetchType) $fetchType = $this->defaultFetchType; //Go with default fetch mode if not specified
-		if(!in_array($fetchType, $this->allowedFetchTypes)) { //Check if it is an allowed fetch type
-			$allowedComma = implode(', ',$this->allowedFetchTypes);
+		if(!in_array($fetchType, self::ALLOWED_FETCH_TYPES)) { //Check if it is an allowed fetch type
+			$allowedComma = implode(', ',self::ALLOWED_FETCH_TYPES);
 			throw new Exception("The variable fetchType must be $allowedComma. You entered $fetchType");
 		}
 		if(!$types) $types = str_repeat('s', count($values)); //String type for all variables if not specified
