@@ -206,7 +206,7 @@ if(!$arr) exit('No rows');
 $names = array_column($arr, 'name');
 $emails = array_column($arr, 'email');
 $numbers = array_column($arr, 'number');
-print_r($names);
+var_export($names);
 ```
 
 Output:
@@ -302,7 +302,7 @@ Output:
 $search = "%{$_POST['search']}%";
 $arr = $mysqli->select("SELECT id, name, age FROM events WHERE name LIKE ?", [$search]);
 if(!$arr) exit('No rows');
-print_r($arr);
+var_export($arr);
 ```
 
 ## Where In Array
@@ -312,7 +312,7 @@ $inArr = [12, 23, 44];
 $clause = implode(',', array_fill(0, count($inArr), '?'));
 $arr = $mysqli->select("SELECT event_name, description, location FROM events WHERE id IN($clause)", $inArr);
 if(!$arr) exit('No rows');
-print_r($arr);
+var_export($arr);
 ```
 
 ### With Other Placeholders
@@ -323,7 +323,7 @@ $clause = implode(',', array_fill(0, count($inArr), '?'));
 $fullArr = array_merge($inArr, [5]);
 $arr = $mysqli->select("SELECT event_name, description, location FROM events WHERE id IN($clause) AND id < ?", $fullArr);
 if(!$arr) exit('No rows');
-print_r($arr);
+var_export($arr);
 ```
 
 ## Transactions
@@ -351,6 +351,18 @@ $mysqli->transaction($sql, $arrOfValues);
 ## Error Handling
 
 Either wrap all your queries with one `try/catch` or use the `set_exception_handler()` function to either redirect to a global error page or a separate one for each page. **Don't forget to take out echo in production**, as you obviously do not need the client to see this information.
+
+### Gotcha with Exception Handling
+
+For some reason, `mysqli_sql_exception` doesn't correctly convert errors to exceptions when too many bound variables or types on `bind_param()`. This is why you should probably set a global error handler to convert this error to an exception. I'm only showing how to convert all warnings, but you can convert all errors to exception, even though a lot of programmers view this as controversial.
+
+```php
+set_error_handler(function($errno, $errstr, $errfile, $errline) {
+  if($errno === E_WARNING) {
+    throw new Exception("$errstr on line $errline in file $errfile");
+  }
+});
+```
 
 **Try/Catch**
 
@@ -397,12 +409,12 @@ new SimpleMySQLi(string $host, string $username, string $password, string $dbNam
   - **'singleRowAssoc'** - Single row with associative keys
   - **'singleRowObj'** - Single row as object
   - **'singleRowNum'** - Single row with numbers
-  - **'scalar'** - Single value. Same as PDO::FETCH_COLUMN
-  - **'col'** - 1D array. Same as PDO::FETCH_COLUMN
-  - **'keyPair'** - Unique key (1st column) to single value (2nd column). Same as PDO::FETCH_KEY_PAIR
-  - **'keyPairArr'** - Unique key (1st column) to array. Same as PDO::FETCH_UNIQUE
-  - **'group'** - Group by common values in the 1st column into associative subarrays. Same as PDO::FETCH_GROUP
-  - **'groupCol'** - Group by common values in the 1st column into 1D subarray. Same as PDO::FETCH_GROUP | PDO::FETCH_COLUMN
+  - **'scalar'** - Single value. Same as `PDO::FETCH_COLUMN`
+  - **'col'** - 1D array. Same as `PDO::FETCH_COLUMN`
+  - **'keyPair'** - Unique key (1st column) to single value (2nd column). Same as `PDO::FETCH_KEY_PAIR`
+  - **'keyPairArr'** - Unique key (1st column) to array. Same as `PDO::FETCH_UNIQUE`
+  - **'group'** - Group by common values in the 1st column into associative subarrays. Same as `PDO::FETCH_GROUP`
+  - **'groupCol'** - Group by common values in the 1st column into 1D subarray. Same as `PDO::FETCH_GROUP | PDO::FETCH_COLUMN`
 
 **Throws**
 
@@ -522,3 +534,13 @@ function close()
 **Description**
 
 Closes the MySQL connection.
+
+# Changelog
+
+- [**1.1.0**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.0.0) - January 3, 2018
+
+  - Add new fetch modes for convenience: 'scalar', 'col', 'keyPair', 'keyPairArr', 'group', 'groupCol'
+
+- [**1.0.0**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.0.0) - December 28, 2017
+
+  - Initial Release
