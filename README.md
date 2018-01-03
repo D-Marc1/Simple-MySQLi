@@ -57,6 +57,7 @@ PHP 7.0+
   - [select()](#select-function)
   - [transaction()](#transaction-function)
   - [close()](#close-function)
+- [Changelog](#changelog)
 
 # Examples
 
@@ -188,7 +189,7 @@ echo $count; //Output: 284
 
 ```php
 $heights = $mysqli->select("SELECT height FROM myTable WHERE id < ?", [500], 'col'); //not necessary to specify 'col' if default fetch type
-if(!heights) exit('No rows');
+if(!$heights) exit('No rows');
 var_export($heights);
 ```
 
@@ -281,7 +282,7 @@ Output:
 
 ```php
 //First column must be common value to group by
-$arr = $mysqli->select("SELECT eye_color, name, weight FROM myTable WHERE age < ?", [29], 'groupCol'); //not necessary to specify 'groupCol' if default fetch type
+$arr = $mysqli->select("SELECT eye_color, name FROM myTable WHERE age < ?", [29], 'groupCol'); //not necessary to specify 'groupCol' if default fetch type
 if(!$arr) exit('No rows');
 var_export($arr);
 ```
