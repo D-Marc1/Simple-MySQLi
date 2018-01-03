@@ -34,8 +34,16 @@ PHP 7.0+
   - [Select](#select)
     - [Fetch Each Column as Separate Array Variable](#fetch-each-column-as-separate-array-variable)
     - [Fetch Associative Array](#fetch-associative-array)
-    - [Fetch Single Row](#fetch-single-row)
     - [Fetch Array of Objects](#fetch-array-of-objects)
+    - [Fetch Single Row](#fetch-single-row)
+    - [Fetch Single Row Like bind_result()](#fetch-single-row-like-bind_result)
+    - [Fetch Single Row, Single Column (Scalar)](#fetch-single-row-single-column-scalar)
+    - [Fetch Single Column as Array](#fetch-single-column-as-array)
+    - [Fetch Each Column as Separate Array Variable](#fetch-each-column-as-separate-array-variable)
+    - [Fetch Key-Pair](#fetch-key-pair)
+    - [Fetch Key, Array as Pair](#fetch-key-array-as-pair)
+    - [Fetch in Groups](#fetch-in-groups)
+    - [Fetch in Groups, One Column](#fetch-in-groups-one-column)
   - [Like](#like)
   - [Where In Array](#where-in-array)
     - [With Other Placeholders](#with-other-placeholders)
@@ -111,23 +119,38 @@ echo $delete->affected_rows;
 
 ## Select
 
-### Fetch Each Column as Separate Array Variable
-
-```php
-$arr = $mysqli->select("SELECT name, email, number FROM events WHERE id <= ?", [$_SESSION['id']]);
-if(!$arr) exit('No rows');
-$names = array_column($arr, 'name');
-$emails = array_column($arr, 'email');
-$numbers = array_column($arr, 'number');
-print_r($names);
-```
-
 ### Fetch Associative Array
 
 ```php
 $arr = $mysqli->select("SELECT id, name, age FROM events WHERE id <= ?", [4], 'assoc'); //not necessary to specify 'assoc' if default fetch type
 if(!$arr) exit('No rows');
-print_r($arr);
+var_export($arr);
+```
+
+Output:
+
+```php
+[
+  ['id' => 24 'name' => 'Jerry', 'age' => 14],
+  ['id' => 201 'name' => 'Alexa', 'age' => 22]
+]
+```
+
+### Fetch Array of Objects
+
+```php
+$arr = $mysqli->select("SELECT id, name, age FROM events WHERE id <= ?", [4], 'obj'); //not necessary to specify 'obj' if default fetch type
+if(!$arr) exit('No rows');
+var_export($arr);
+```
+
+Output:
+
+```php
+[
+  stdClass Object ['id' => 24 'name' => 'Jerry', 'age' => 14],
+  stdClass Object ['id' => 201 'name' => 'Alexa', 'age' => 22]
+]
 ```
 
 ### Fetch Single Row
@@ -135,7 +158,13 @@ print_r($arr);
 ```php
 $arr = $mysqli->select("SELECT id, name, age FROM events WHERE id <= ?", [12], 'singleRowAssoc'); //not necessary to specify 'singleRowAssoc' if default fetch type
 if(!$arr) exit('No rows');
-print_r($arr);
+var_export($arr);
+```
+
+Output:
+
+```php
+['id' => 24 'name' => 'Jerry', 'age' => 14]
 ```
 
 ### Fetch Single Row Like bind_result()
@@ -144,15 +173,127 @@ print_r($arr);
 $arr = $mysqli->select("SELECT id, name, age FROM myTable WHERE name = ?", [$_POST['name']], 'singleRowNum'); //must use number array to use in list
 if(!$arr) exit('No rows');
 list($id, $name, $age) = $arr;
-echo $age;
+echo $age; //Output 34
 ```
 
-### Fetch Array of Objects
+### Fetch Single Row, Single Column (Scalar)
 
 ```php
-$arr = $mysqli->select("SELECT id, name, age FROM events WHERE id <= ?", [4], 'obj'); //not necessary to specify 'obj' if default fetch type
+$count = $mysqli->select("SELECT COUNT(*) FROM myTable WHERE name = ?", [$_POST['name']], 'scalar'); //not necessary to specify 'scalar' if default fetch type
+if(!$count) exit('No rows');
+echo $count; //Output: 284
+```
+
+### Fetch Single Column as Array
+
+```php
+$heights = $mysqli->select("SELECT height FROM myTable WHERE id < ?", [500], 'col'); //not necessary to specify 'col' if default fetch type
+if(!heights) exit('No rows');
+var_export($heights);
+```
+
+Output:
+
+```php
+[78, 64, 68, 54, 58, 63]
+```
+
+### Fetch Each Column as Separate Array Variable
+
+```php
+$arr = $mysqli->select("SELECT name, email, number FROM events WHERE id <= ?", [450], 'assoc');
 if(!$arr) exit('No rows');
-print_r($arr);
+$names = array_column($arr, 'name');
+$emails = array_column($arr, 'email');
+$numbers = array_column($arr, 'number');
+print_r($names);
+```
+
+Output:
+
+```php
+['Bobby', 'Jessica', 'Victor', 'Andrew', 'Mallory']
+```
+
+### Fetch Key-Pair
+
+```php
+//First column must be unique, like a primary key; can only select 2 columns
+$arr = $mysqli->select("SELECT id, name FROM myTable WHERE age <= ?", [25], 'keyPair'); //not necessary to specify 'keyPair' if default fetch type
+if(!$arr) exit('No rows');
+var_export($arr);
+```
+
+Output:
+
+```php
+[7 => 'Jerry', 10 => 'Bill', 29 => 'Bobby']
+```
+
+### Fetch Key, Array as Pair
+
+```php
+//First column must be unique, like a primary key
+$arr = $mysqli->select("SELECT id, max_bench, max_squat FROM myTable WHERE weight < ?", [205], 'keyPairArr'); //not necessary to specify 'keyPairArr' if default fetch type
+if(!$arr) exit('No rows');
+var_export($arr);
+```
+
+Output:
+
+```php
+[
+  17 => ['max_bench' => 230, 'max_squat' => 175],
+  84 => ['max_bench' => 195, 'max_squat' => 235],
+  136 => ['max_bench' => 135, 'max_squat' => 285]
+]
+```
+
+### Fetch in Groups
+
+```php
+//First column must be common value to group by
+$arr = $mysqli->select("SELECT eye_color, name, weight FROM myTable WHERE age < ?", [29], 'group'); //not necessary to specify 'group' if default fetch type
+if(!$arr) exit('No rows');
+var_export($arr);
+```
+
+Output:
+
+```php
+[
+  'green' => [
+    ['name' => 'Patrick', 'weight' => 178],
+    ['name' => 'Olivia', 'weight' => 132]
+  ],
+  'blue' => [
+    ['name' => 'Kyle', 'weight' => 128],
+    ['name' => 'Ricky', 'weight' => 143]
+  ],
+  'brown' => [
+    ['name' => 'Jordan', 'weight' => 173],
+    ['name' => 'Eric', 'weight' => 198]
+  ]
+]
+```
+
+### Fetch in Groups, One Column
+
+```php
+//First column must be common value to group by
+$arr = $mysqli->select("SELECT eye_color, name, weight FROM myTable WHERE age < ?", [29], 'groupCol'); //not necessary to specify 'groupCol' if default fetch type
+if(!$arr) exit('No rows');
+var_export($arr);
+```
+
+Output:
+
+```php
+[
+  'green' => ['Patrick', 'Olivia'],
+  'blue' => ['Kyle', 'Ricky'],
+  'brown' => ['Jordan', 'Eric']
+]
 ```
 
 ## Like
@@ -244,18 +385,24 @@ new SimpleMySQLi(string $host, string $username, string $password, string $dbNam
 
 **Parameters**
 
-- **string $host** - the host, like localhost for example
-- **string $username** - database username
-- **string $password** - database password
-- **string $dbName** - database name
-- **string $charset = 'utf8'** (optional) - default character encoding
-- **string defaultFetchType = 'assoc'** (optional) - default fetch type. Can be:
-  - **'assoc'** - associative array
-  - **'obj'** - object array
-  - **'num'** - number array
-  - **'singleRowAssoc'** - single row with associative keys
-  - **'singleRowObj'** - single row as object
-  - **'singleRowNum'** - single row with numbers
+- **string $host** - Hostname or an IP address, like localhost or 127.0.0.1
+- **string $username** - Database username
+- **string $password** - Database password
+- **string $dbName** - Database name
+- **string $charset = 'utf8'** (optional) - Default character encoding
+- **string defaultFetchType = 'assoc'** (optional) - Default fetch type. Can be:
+  - **'assoc'** - Associative array
+  - **'obj'** - Object array
+  - **'num'** - Number array
+  - **'singleRowAssoc'** - Single row with associative keys
+  - **'singleRowObj'** - Single row as object
+  - **'singleRowNum'** - Single row with numbers
+  - **'scalar'** - Single value. Same as PDO::FETCH_COLUMN
+  - **'col'** - 1D array. Same as PDO::FETCH_COLUMN
+  - **'keyPair'** - Unique key (1st column) to single value (2nd column). Same as PDO::FETCH_KEY_PAIR
+  - **'keyPairArr'** - Unique key (1st column) to array. Same as PDO::FETCH_UNIQUE
+  - **'group'** - Group by common values in the 1st column into associative subarrays. Same as PDO::FETCH_GROUP
+  - **'groupCol'** - Group by common values in the 1st column into 1D subarray. Same as PDO::FETCH_GROUP | PDO::FETCH_COLUMN
 
 **Throws**
 
@@ -341,21 +488,23 @@ function select(string $sql, array $values = [], string $fetchType = '', string 
 
 - **Array of `$fetchType` specified**
 - **[]** if select yields 0 rows
+- **Scalar**
 
 **Throws**
 
 - Throws exception if `$fetchType` specified isn't one of the allowed fetch modes
+- Throws exception if fetch mode specification is violated
 - Throws exception with reason if any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
 
 ## Transaction Function
 
 ```php
-function transaction(mixed $sql, array $values, array $types = [])
+function transaction(array|string $sql, array $values, array $types = [])
 ```
 
 **Parameters**
 
-- **mixed $sql** - SQL query; can be array for different queries or a string for the same query with different values
+- **array|string $sql** - SQL query; can be array for different queries or a string for the same query with different values
 - **array $values** - values or variables to bind to query
 - **string $types = ''** (optional) - variable type for each bound value/variable
 
