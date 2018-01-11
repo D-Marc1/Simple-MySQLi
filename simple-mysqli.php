@@ -182,7 +182,7 @@ class SimpleMySQLi {
 			$countValues = count($values);
 
 			if(!is_array($sql)) {
-				$daSql = $sql;
+				$currSql = $sql;
 				$isArray = false;
 			}
 			else $countSql = count($sql); //Only count sql if array
@@ -192,11 +192,13 @@ class SimpleMySQLi {
 			}
 
 			for($x = 0; $x < $countValues; $x++) {
-				if(!$types) $daTypes[$x] = str_repeat('s', count($values[$x])); //String type for all variables if not specified
-				if($isArray) $daSql = $sql[$x]; //Either different queries or the same one with different values
+				if(!$types) $currTypes = str_repeat('s', count($values[$x])); //String type for all variables if not specified
+				else $currTypes = $types[$x];
 
-				$stmt = $this->mysqli->prepare($daSql);
-				$stmt->bind_param($daTypes[$x], ...$values[$x]);
+				if($isArray) $currSql = $sql[$x]; //Either different queries or the same one with different values
+
+				$stmt = $this->mysqli->prepare($currSql);
+				$stmt->bind_param($currTypes, ...$values[$x]);
 				$stmt->execute();
 				$stmt->close();
 			}
