@@ -536,6 +536,10 @@ Closes the MySQL connection.
 
 # Changelog
 
+- [**1.1.1**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.1.0) - January 11, 2018
+
+  - Fix transactions
+
 - [**1.1.0**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.1.0) - January 3, 2018
 
   - Add new fetch modes for convenience: 'scalar', 'col', 'keyPair', 'keyPairArr', 'group', 'groupCol'
