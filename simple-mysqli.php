@@ -181,6 +181,8 @@ class SimpleMySQLi {
 			$isArray = true;
 			$countValues = count($values);
 
+			if($types) $countTypes = count($types);
+
 			if(!is_array($sql)) {
 				$currSql = $sql;
 				$isArray = false;
@@ -189,6 +191,9 @@ class SimpleMySQLi {
 
 			if($isArray && $countValues !== $countSql) { //If SQL array and type amounts don't match
 				throw new SimpleMySQLiException("The paramters 'sql' and 'values' must correlate if 'sql' is an array. You entered 'sql' array count: $countSql and 'types' array count: $countValues");
+			}
+			else if($types && $countValues !== $countTypes) {
+				throw new SimpleMySQLiException("The paramters 'values' and 'types' must correlate. You entered 'values' array count: $countValues and 'types' array count: $countTypes");
 			}
 
 			for($x = 0; $x < $countValues; $x++) {
