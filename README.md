@@ -355,7 +355,7 @@ Either wrap all your queries with one `try/catch` or use the `set_exception_hand
 
 ### Gotcha with Exception Handling
 
-For some reason, `mysqli_sql_exception` doesn't correctly convert errors to exceptions when too many bound variables or types on `bind_param()`. This is why you should probably set a global error handler to convert this error to an exception. I'm showing how to convert all errors to exception, but it should be noted that a lot of programmers view this as controversial.
+For some reason, `mysqli_sql_exception` doesn't correctly convert errors to exceptions when too many bound variables or types on `bind_param()`. This is why you should probably set a global error handler to convert this error to an exception. I'm showing how to convert all errors to exceptions, but it should be noted that a lot of programmers view this as controversial. In this case you only really have to worry about `E_WARNING` anyway.
 
 ```php
 set_error_handler(function($errno, $errstr, $errfile, $errline) {

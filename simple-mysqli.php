@@ -178,11 +178,11 @@ class SimpleMySQLi {
 		try {
 			$this->mysqli->autocommit(FALSE);
 			for($x = 0; $x < count($values); $x++) {
-				if(!$types) $types[$x] = str_repeat('s', count($values[$x])); //String type for all variables if not specified
+				if(!$types) $daTypes[$x] = str_repeat('s', count($values[$x])); //String type for all variables if not specified
 				$daSql = (!is_array($sql) ? $sql : $sql[$x]); //Either different queries or the same one with different values
 
 				$stmt = $this->mysqli->prepare($daSql);
-				$stmt->bind_param($types[$x], ...$values[$x]);
+				$stmt->bind_param($daTypes[$x], ...$values[$x]);
 				$stmt->execute();
 				$stmt->close();
 			}
