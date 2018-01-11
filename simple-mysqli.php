@@ -97,7 +97,7 @@ class SimpleMySQLi {
 	 * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
 	public function delete(string $sql, array $values, string $types = '') {
-		$this->update($sql, $values, $types);
+		return $this->update($sql, $values, $types);
 	}
 
 	/**
