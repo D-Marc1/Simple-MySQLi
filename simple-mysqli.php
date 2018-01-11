@@ -177,9 +177,23 @@ class SimpleMySQLi {
 	public function transaction($sql, array $values, array $types = []) {
 		try {
 			$this->mysqli->autocommit(FALSE);
-			for($x = 0; $x < count($values); $x++) {
+
+			$isArray = true;
+			$countValues = count($values);
+
+			if(!is_array($sql)) {
+				$daSql = $sql;
+				$isArray = false;
+			}
+			else $countSql = count($sql); //Only count sql if array
+
+			if($isArray && $countValues !== $countSql) { //If SQL array and type amounts don't match
+				throw new SimpleMySQLiException("The paramters 'sql' and 'values' must correlate if 'sql' is an array. You entered 'sql' array count: $countSql and 'types' array count: $countValues");
+			}
+
+			for($x = 0; $x < $countValues; $x++) {
 				if(!$types) $daTypes[$x] = str_repeat('s', count($values[$x])); //String type for all variables if not specified
-				$daSql = (!is_array($sql) ? $sql : $sql[$x]); //Either different queries or the same one with different values
+				if($isArray) $daSql = $sql[$x]; //Either different queries or the same one with different values
 
 				$stmt = $this->mysqli->prepare($daSql);
 				$stmt->bind_param($daTypes[$x], ...$values[$x]);
