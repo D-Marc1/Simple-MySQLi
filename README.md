@@ -417,8 +417,8 @@ new SimpleMySQLi(string $host, string $username, string $password, string $dbNam
 
 **Throws**
 
-- Throws exception if `$defaultFetchType` specified isn't one of the allowed fetch modes
-- Throws exception with reason if any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
+- **SimpleMySQLiException** if `$defaultFetchType` specified isn't one of the allowed fetch modes
+- **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
 
 ## Insert Function
 
@@ -440,7 +440,7 @@ function insert(string $sql, array $values, bool $getInsertId = false, string $t
 
 **Throws**
 
-- Throws exception with reason if any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
+- **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
 
 ## Update Function
 
@@ -460,7 +460,7 @@ function update(string $sql, array $values, string $types = '')
 
 **Throws**
 
-- Throws exception with reason if any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
+- **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
 
 ## Delete Function
 
@@ -480,7 +480,7 @@ function delete(string $sql, array $values, string $types = '')
 
 **Throws**
 
-- Throws exception with reason if any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
+- **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
 
 ## Select Function
 
@@ -503,9 +503,10 @@ function select(string $sql, array $values = [], string $fetchType = '', string 
 
 **Throws**
 
-- Throws exception if `$fetchType` specified isn't one of the allowed fetch modes
-- Throws exception if fetch mode specification is violated
-- Throws exception with reason if any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
+- **SimpleMySQLiException**
+  - If $fetchType specified isn't one of the allowed fetch modes in $defaultFetchType
+  - If fetch mode specification is violated
+- **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
 
 ## Transaction Function
 
@@ -521,8 +522,8 @@ function transaction(array|string $sql, array $values, array $types = [])
 
 **Throws**
 
-- Throws exception if transaction fails
-- Throws exception with reason if any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
+- **SimpleMySQLiException** If there is a mismatch in parameter values, parameter types or SQL
+- **mysqli_sql_exception** If transaction failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
 
 ## Close Function
 
@@ -535,6 +536,10 @@ function close()
 Closes the MySQL connection.
 
 # Changelog
+
+- [**1.1.2**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.1.2) - January 15, 2018
+
+  - Fix return on `delete()`
 
 - [**1.1.1**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.1.1) - January 11, 2018
 

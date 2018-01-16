@@ -32,7 +32,7 @@ class SimpleMySQLi {
 	 *               'keyPairArr' - Unique key (1st column) to array. Same as PDO::FETCH_UNIQUE
 	 *               'group' - Group by common values in the 1st column into associative subarrays. Same as PDO::FETCH_GROUP
 	 *               'groupCol' - Group by common values in the 1st column into 1D subarray. Same as PDO::FETCH_GROUP | PDO::FETCH_COLUMN
-	 * @throws Exception If $defaultFetchType specified isn't one of the allowed fetch modes
+	 * @throws SimpleMySQLiException If $defaultFetchType specified isn't one of the allowed fetch modes
 	 * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
 	public function __construct(string $host, string $username, string $password, string $dbName, string $charset = 'utf8', string $defaultFetchType = 'assoc') {
@@ -106,8 +106,8 @@ class SimpleMySQLi {
 	 * @param string $fetchType (optional) This overrides the default fetch type set in the constructor
 	 * @param string $types (optional) Variable type for each bound value/variable
 	 * @return mixed Array of Either fetch type specified or default fetch mode. Can be a scalar too
-	 * @throws Exception If $fetchType specified isn't one of the allowed fetch modes in $defaultFetchType
-	 * @throws Exception If fetch mode specification is violated
+	 * @throws SimpleMySQLiException If $fetchType specified isn't one of the allowed fetch modes in $defaultFetchType
+	 *                               If fetch mode specification is violated
 	 * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
 	public function select(string $sql, array $values = [], string $fetchType = '', string $types = '') {
@@ -171,8 +171,8 @@ class SimpleMySQLi {
 	 * @param array|string $sql SQL query. Can be array for different queries or a string for the same query with different values
 	 * @param array $values Values or variables to bind to query
 	 * @param array $types (optional) Variable type for each bound value/variable
-	 * @throws Exception If transaction fails
-	 * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
+	 * @throws SimpleMySQLiException If there is a mismatch in parameter values, parameter types or SQL
+	 * @throws mysqli_sql_exception If transaction failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
 	public function transaction($sql, array $values, array $types = []) {
 		try {
