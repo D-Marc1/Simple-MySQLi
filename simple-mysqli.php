@@ -7,10 +7,14 @@ class SimpleMySQLiException extends Exception {}
  */
 class SimpleMySQLi {
 	private $mysqli;
+	private $stmtResult; //used to store get_result()
 	private $defaultFetchType;
-	private const ALLOWED_FETCH_TYPES = ['assoc', 'obj', 'num', 'singleRowAssoc', 'singleRowObj',
-																			 'singleRowNum', 'scalar', 'col', 'keyPair', 'keyPairArr',
-																			 'group', 'groupCol'];
+	private const ALLOWED_FETCH_TYPES_BOTH = [
+		'assoc', 'obj', 'num', 'col'
+	];
+	private const ALLOWED_FETCH_TYPES_FETCH_ALL = [
+		'keyPair', 'keyPairArr', 'group', 'groupCol'
+	];
 
 	/**
 	 * SimpleMySQLi constructor
@@ -23,23 +27,15 @@ class SimpleMySQLi {
 	 *               'assoc' - Associative array
 	 *               'obj' - Object array
 	 *               'num' - Number array
-	 *               'singleRowAssoc' - Single row with associative keys
-	 *               'singleRowObj' - Single row as object
-	 *               'singleRowNum' - Single row with numbers
-	 *               'scalar' - Single value. Same as PDO::FETCH_COLUMN
 	 *               'col' - 1D array. Same as PDO::FETCH_COLUMN
-	 *               'keyPair' - Unique key (1st column) to single value (2nd column). Same as PDO::FETCH_KEY_PAIR
-	 *               'keyPairArr' - Unique key (1st column) to array. Same as PDO::FETCH_UNIQUE
-	 *               'group' - Group by common values in the 1st column into associative subarrays. Same as PDO::FETCH_GROUP
-	 *               'groupCol' - Group by common values in the 1st column into 1D subarray. Same as PDO::FETCH_GROUP | PDO::FETCH_COLUMN
 	 * @throws SimpleMySQLiException If $defaultFetchType specified isn't one of the allowed fetch modes
 	 * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
 	public function __construct(string $host, string $username, string $password, string $dbName, string $charset = 'utf8', string $defaultFetchType = 'assoc') {
 		$this->defaultFetchType = $defaultFetchType;
 
-		if(!in_array($defaultFetchType, self::ALLOWED_FETCH_TYPES)) { //check if it is an allowed fetch type
-			$allowedComma = implode("','", self::ALLOWED_FETCH_TYPES);
+		if(!in_array($defaultFetchType, self::ALLOWED_FETCH_TYPES_BOTH)) { //check if it is an allowed fetch type
+			$allowedComma = implode("','", self::ALLOWED_FETCH_TYPES_BOTH);
 			throw new SimpleMySQLiException("The variable 'defaultFetchType' must be '$allowedComma'. You entered '$defaultFetchType'");
 		}
 
@@ -101,60 +97,108 @@ class SimpleMySQLi {
 	}
 
 	/**
+	 * Used to get the result, but needs to be used with either `fetch()` for single row and loop fetching or `fetchAll()` for fetching all results
 	 * @param string $sql SQL query
 	 * @param array $values (optional) Values or variables to bind to query. Can be empty for selecting all rows
-	 * @param string $fetchType (optional) This overrides the default fetch type set in the constructor
 	 * @param string $types (optional) Variable type for each bound value/variable
-	 * @return mixed Array of Either fetch type specified or default fetch mode. Can be a scalar too
-	 * @throws SimpleMySQLiException If $fetchType specified isn't one of the allowed fetch modes in $defaultFetchType
-	 *                               If fetch mode specification is violated
 	 * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
-	public function select(string $sql, array $values = [], string $fetchType = '', string $types = '') {
-		$arr = [];
-
-		if(!$fetchType) $fetchType = $this->defaultFetchType; //Go with default fetch mode if not specified
-		if(!in_array($fetchType, self::ALLOWED_FETCH_TYPES)) { //Check if it is an allowed fetch type
-			$allowedComma = implode("','", self::ALLOWED_FETCH_TYPES);
-			throw new SimpleMySQLiException("The variable 'fetchType' must be '$allowedComma'. You entered '$fetchType'");
-		}
+	public function select(string $sql, array $values = [], string $types = '') {
 		if(!$types) $types = str_repeat('s', count($values)); //String type for all variables if not specified
 
 		$stmt = $this->mysqli->prepare($sql);
 		if($values) $stmt->bind_param($types, ...$values);
 		$stmt->execute();
-		$result = $stmt->get_result();
+		$this->stmtResult = $stmt->get_result();
+		$stmt->close();
+
+		return $this;
+	}
+
+	/**
+	* Fetch one row at a time
+	* @param string $fetchType (optional) This overrides the default fetch type set in the constructor. Can be an default type
+	* @return mixed Array of either fetch type specified or default fetch mode. Can be a scalar too. Null if no more rows
+	* @throws SimpleMySQLiException If $fetchType specified isn't one of the allowed fetch modes in $defaultFetchType
+	*                               If fetch mode specification is violated
+	* @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
+	*/
+	public function fetch(string $fetchType = '') {
+		$stmtResult = $this->stmtResult;
+		$row = [];
+
+		if(!$fetchType) $fetchType = $this->defaultFetchType; //Go with default fetch mode if not specified
+
+		if(!in_array($fetchType, self::ALLOWED_FETCH_TYPES_BOTH)) { //Check if it is an allowed fetch type
+			$allowedComma = implode("','", self::ALLOWED_FETCH_TYPES_BOTH);
+			throw new SimpleMySQLiException("The variable 'fetchType' must be '$allowedComma'. You entered '$fetchType'");
+		}
+
+		if($fetchType === 'num') $row = $stmtResult->fetch_row();
+		else if($fetchType === 'assoc') $row = $stmtResult->fetch_assoc();
+		else if($fetchType === 'obj') $row = $stmtResult->fetch_object();
+		else if($fetchType === 'col') {
+			if($stmtResult->field_count !== 1) {
+				throw new SimpleMySQLiException("The fetch type: '$fetchType' must have exactly 1 column in query");
+			}
+			$row = $stmtResult->fetch_row()[0];
+		}
+
+		return $row;
+	}
+
+	/**
+	* Fetch all results in array
+	* @param string $fetchType (optional) This overrides the default fetch type set in the constructor. Can be any default type and:
+	*               'keyPair' - Unique key (1st column) to single value (2nd column). Same as PDO::FETCH_KEY_PAIR
+	*               'keyPairArr' - Unique key (1st column) to array. Same as PDO::FETCH_UNIQUE
+	*               'group' - Group by common values in the 1st column into associative subarrays. Same as PDO::FETCH_GROUP
+	*               'groupCol' - Group by common values in the 1st column into 1D subarray. Same as PDO::FETCH_GROUP | PDO::FETCH_COLUMN
+	* @return array Full array of $fetchType specified; [] if no rows
+	* @throws SimpleMySQLiException If $fetchType specified isn't one of the allowed fetch modes in $defaultFetchType
+	*                               If fetch mode specification is violated
+	* @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
+	*/
+	public function fetchAll(string $fetchType = '') {
+		$stmtResult = $this->stmtResult;
+		$arr = [];
+
+		if(!$fetchType) $fetchType = $this->defaultFetchType; //Go with default fetch mode if not specified
+
+		$comboAllowedTypes = array_merge(self::ALLOWED_FETCH_TYPES_BOTH, self::ALLOWED_FETCH_TYPES_FETCH_ALL); //fetchAll() can take any fetch type
+
+		if(!in_array($fetchType, $comboAllowedTypes)) { //Check if it is an allowed fetch type
+			$allowedComma = implode("','", $comboAllowedTypes);
+			throw new SimpleMySQLiException("The variable 'fetchType' must be '$allowedComma'. You entered '$fetchType'");
+		}
+
 		//All of the fetch types
-		if($fetchType === 'singleRowNum') $arr = $result->fetch_row();
-		else if($fetchType === 'singleRowAssoc') $arr = $result->fetch_assoc();
-		else if($fetchType === 'singleRowObj') $arr = $result->fetch_object();
-		else if($fetchType === 'num') $arr = $result->fetch_all(MYSQLI_NUM);
-		else if($fetchType === 'assoc') $arr = $result->fetch_all(MYSQLI_ASSOC);
+		if($fetchType === 'num') $arr = $stmtResult->fetch_all(MYSQLI_NUM);
+		else if($fetchType === 'assoc') $arr = $stmtResult->fetch_all(MYSQLI_ASSOC);
 		else if($fetchType === 'obj') {
-			while($row = $result->fetch_object()) {
+			while($row = $stmtResult->fetch_object()) {
 				$arr[] = $row;
 			}
 		}
-		else if($fetchType === 'col' || $fetchType === 'scalar') {
-			if($result->field_count !== 1) {
+		else if($fetchType === 'col') {
+			if($stmtResult->field_count !== 1) {
 				throw new SimpleMySQLiException("The fetch type: '$fetchType' must have exactly 1 column in query");
 			}
-			while($row = $result->fetch_row()) {
-				if($fetchType === 'col') $arr[] = $row[0];
-				if($fetchType === 'scalar') $arr = $row[0]; //obviously a misnomer, as this is a scalar, not array
+			while($row = $stmtResult->fetch_row()) {
+				$arr[] = $row[0];
 			}
 		}
-		else if($fetchType === 'keyPair' || $fetchType = 'groupCol') {
-			if($result->field_count !== 2) {
+		else if($fetchType === 'keyPair' || $fetchType === 'groupCol') {
+			if($stmtResult->field_count !== 2) {
 				throw new SimpleMySQLiException("The fetch type: '$fetchType' must have exactly two columns in query");
 			}
-			while($row = $result->fetch_row()) {
+			while($row = $stmtResult->fetch_row()) {
 				if($fetchType === 'keyPair') $arr[$row[0]] = $row[1];
-				else if($fetchType = 'groupCol') $arr[$row[0]][] = $row[1];
+				else if($fetchType === 'groupCol') $arr[$row[0]][] = $row[1];
 			}
 		}
 		else if($fetchType === 'keyPairArr' || $fetchType === 'group') {
-			while($row = $result->fetch_row()) {
+			while($row = $stmtResult->fetch_row()) {
 				$firstCol = $row[0];
 				unset($row[0]);
 				if($fetchType === 'keyPairArr') $arr[$firstCol] = $row;
@@ -162,9 +206,7 @@ class SimpleMySQLi {
 			}
 		}
 
-		$stmt->close();
-
-		return ($arr ?: []); //account for single row fetching, since those functions return null, not empty array
+		return $arr;
 	}
 
 	/**
