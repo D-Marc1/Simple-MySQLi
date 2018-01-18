@@ -288,7 +288,7 @@ Output:
 
 ```php
 //First column must be common value to group by
-$arr = $mysqli->select("SELECT eye_color, name FROM myTable WHERE age < ?", [29])->fetchAll("groupCol"); //not necessary to specify 'groupCol' if default fetch type
+$arr = $mysqli->select("SELECT eye_color, name FROM myTable WHERE age < ?", [29])->fetchAll("groupCol");
 if(!$arr) exit('No rows');
 var_export($arr);
 ```
@@ -504,7 +504,7 @@ Used to get the result, but needs to be used with either `fetch()` for single ro
 ## Fetch Function
 
 ```php
-fetch(string $fetchType = '')
+function fetch(string $fetchType = '')
 ```
 
 **Description**
@@ -531,7 +531,7 @@ Fetch one row at a time
 ## FetchAll Function
 
 ```php
-fetchAll(string $fetchType = '')
+function fetchAll(string $fetchType = '')
 ```
 
 **Description**
