@@ -51,14 +51,14 @@ PHP 7.0+
     - [Same Template, Different Values](#same-template-different-values)
 - [Documentation](#documentation)
   - [Constructor](#constructor)
-  - [insert()](#insert-function)
-  - [update()](#update-function)
-  - [delete()](#delete-function)
-  - [select()](#select-function)
-  - [fetch()](#fetch-function)
-  - [fetchAll()](#fetchAll-function)
-  - [transaction()](#transaction-function)
-  - [close()](#close-function)
+  - [insert()](#insert)
+  - [update()](#update)
+  - [delete()](#delete)
+  - [select()](#select)
+  - [fetch()](#fetch)
+  - [fetchAll()](#fetchAll)
+  - [transaction()](#transaction)
+  - [close()](#close)
 - [Changelog](#changelog)
 
 # Examples
@@ -95,29 +95,23 @@ $mysqli = new SimpleMySQLi("localhost", "username", "password", "dbName", "utf8"
 ## Insert
 
 ```php
-$insert = $mysqli->insert("INSERT INTO myTable (name, age) VALUES (?, ?)", [$_POST['name'], $_POST['age']]);
-echo $insert->affected_rows;
-```
-
-```php
-//returns $stmt->affected_rows by default; if set to true, then it will print object with $mysqli->insert_id too
-$insert = $mysqli->insert("INSERT INTO myTable (name, age) VALUES (?, ?)", [$_POST['name'], $_POST['age']], true);
-echo $insert->affected_rows;
-echo $insert->insert_id;
+$insert = $mysqli->query("INSERT INTO myTable (name, age) VALUES (?, ?)", [$_POST['name'], $_POST['age']]);
+echo $insert->affectedRows(); //Can be $mysqli->affectedRows()
+echo $insert->insertId(); //Can be $mysqli->insertId()
 ```
 
 ## Update
 
 ```php
-$update = $mysqli->update("UPDATE myTable SET name = ? WHERE id = ?", [$_POST['name'], $_SESSION['id']]);
-echo $update->affected_rows;
+$update = $mysqli->query("UPDATE myTable SET name = ? WHERE id = ?", [$_POST['name'], $_SESSION['id']]);
+echo $update->affectedRows(); //Can be $mysqli->affectedRows()
 ```
 
 ## Delete
 
 ```php
-$delete = $mysqli->delete("DELETE FROM myTable WHERE id = ?", [$_SESSION['id']]);
-echo $delete->affected_rows;
+$delete = $mysqli->query("DELETE FROM myTable WHERE id = ?", [$_SESSION['id']]);
+echo $delete->affectedRow(); //Can be $mysqli->affectedRows()
 ```
 
 ## Select
@@ -127,7 +121,7 @@ You can either fetch your entire result in an array with `fetchAll()` or loop th
 ### Fetch Associative Array
 
 ```php
-$arr = $mysqli->select("SELECT id, name, age FROM events WHERE id <= ?", [4])->fetchAll("assoc");
+$arr = $mysqli->query("SELECT id, name, age FROM events WHERE id <= ?", [4])->fetchAll("assoc");
 if(!$arr) exit('No rows');
 var_export($arr);
 ```
@@ -144,7 +138,7 @@ Output:
 ### Fetch Array of Objects
 
 ```php
-$arr = $mysqli->select("SELECT id, name, age FROM events WHERE id <= ?", [4])->fetchAll("obj");
+$arr = $mysqli->query("SELECT id, name, age FROM events WHERE id <= ?", [4])->fetchAll("obj");
 if(!$arr) exit('No rows');
 var_export($arr);
 ```
@@ -161,7 +155,7 @@ Output:
 ### Fetch Single Row
 
 ```php
-$arr = $mysqli->select("SELECT id, name, age FROM events WHERE id <= ?", [12])->fetch("assoc");
+$arr = $mysqli->query("SELECT id, name, age FROM events WHERE id <= ?", [12])->fetch("assoc");
 if(!$arr) exit('No rows');
 var_export($arr);
 ```
@@ -175,7 +169,7 @@ Output:
 ### Fetch Single Row Like bind_result()
 
 ```php
-$arr = $mysqli->select("SELECT id, name, age FROM myTable WHERE name = ?", [$_POST['name']])->fetchAll("num"); //must use number array to use in list
+$arr = $mysqli->query("SELECT id, name, age FROM myTable WHERE name = ?", [$_POST['name']])->fetchAll("num"); //must use number array to use in list
 if(!$arr) exit('No rows');
 list($id, $name, $age) = $arr;
 echo $age; //Output 34
@@ -184,7 +178,7 @@ echo $age; //Output 34
 ### Fetch Single Row, Single Column (Scalar)
 
 ```php
-$count = $mysqli->select("SELECT COUNT(*) FROM myTable WHERE name = ?", [$_POST['name']])->fetch("col");
+$count = $mysqli->query("SELECT COUNT(*) FROM myTable WHERE name = ?", [$_POST['name']])->fetch("col");
 if(!$count) exit('No rows');
 echo $count; //Output: 284
 ```
@@ -192,7 +186,7 @@ echo $count; //Output: 284
 ### Fetch Single Column as Array
 
 ```php
-$heights = $mysqli->select("SELECT height FROM myTable WHERE id < ?", [500])->fetchAll("col");
+$heights = $mysqli->query("SELECT height FROM myTable WHERE id < ?", [500])->fetchAll("col");
 if(!$heights) exit('No rows');
 var_export($heights);
 ```
@@ -206,7 +200,7 @@ Output:
 ### Fetch Each Column as Separate Array Variable
 
 ```php
-$result = $mysqli->select("SELECT name, email, number FROM events WHERE id <= ?", [450]);
+$result = $mysqli->query("SELECT name, email, number FROM events WHERE id <= ?", [450]);
 while($row = $result->fetch("assoc")) {
   $names[] = $row['name'];
   $emails[] = $row['email'];
@@ -226,7 +220,7 @@ Output:
 
 ```php
 //First column must be unique, like a primary key; can only select 2 columns
-$arr = $mysqli->select("SELECT id, name FROM myTable WHERE age <= ?", [25])->fetchAll("keyPair");
+$arr = $mysqli->query("SELECT id, name FROM myTable WHERE age <= ?", [25])->fetchAll("keyPair");
 if(!$arr) exit('No rows');
 var_export($arr);
 ```
@@ -241,7 +235,7 @@ Output:
 
 ```php
 //First column must be unique, like a primary key
-$arr = $mysqli->select("SELECT id, max_bench, max_squat FROM myTable WHERE weight < ?", [205])->fetchAll("keyPairArr");
+$arr = $mysqli->query("SELECT id, max_bench, max_squat FROM myTable WHERE weight < ?", [205])->fetchAll("keyPairArr");
 if(!$arr) exit('No rows');
 var_export($arr);
 ```
@@ -260,7 +254,7 @@ Output:
 
 ```php
 //First column must be common value to group by
-$arr = $mysqli->select("SELECT eye_color, name, weight FROM myTable WHERE age < ?", [29])->fetchAll("group");
+$arr = $mysqli->query("SELECT eye_color, name, weight FROM myTable WHERE age < ?", [29])->fetchAll("group");
 if(!$arr) exit('No rows');
 var_export($arr);
 ```
@@ -288,7 +282,7 @@ Output:
 
 ```php
 //First column must be common value to group by
-$arr = $mysqli->select("SELECT eye_color, name FROM myTable WHERE age < ?", [29])->fetchAll("groupCol");
+$arr = $mysqli->query("SELECT eye_color, name FROM myTable WHERE age < ?", [29])->fetchAll("groupCol");
 if(!$arr) exit('No rows');
 var_export($arr);
 ```
@@ -307,7 +301,7 @@ Output:
 
 ```php
 $search = "%{$_POST['search']}%";
-$arr = $mysqli->select("SELECT id, name, age FROM events WHERE name LIKE ?", [$search])->fetchAll();
+$arr = $mysqli->query("SELECT id, name, age FROM events WHERE name LIKE ?", [$search])->fetchAll();
 if(!$arr) exit('No rows');
 var_export($arr);
 ```
@@ -317,7 +311,7 @@ var_export($arr);
 ```php
 $inArr = [12, 23, 44];
 $clause = implode(',', array_fill(0, count($inArr), '?'));
-$arr = $mysqli->select("SELECT event_name, description, location FROM events WHERE id IN($clause)", $inArr)->fetchAll();
+$arr = $mysqli->query("SELECT event_name, description, location FROM events WHERE id IN($clause)", $inArr)->fetchAll();
 if(!$arr) exit('No rows');
 var_export($arr);
 ```
@@ -328,7 +322,7 @@ var_export($arr);
 $inArr = [12, 23, 44];
 $clause = implode(',', array_fill(0, count($inArr), '?'));
 $fullArr = array_merge($inArr, [5]);
-$arr = $mysqli->select("SELECT event_name, description, location FROM events WHERE id IN($clause) AND id < ?", $fullArr)->fetchAll();
+$arr = $mysqli->query("SELECT event_name, description, location FROM events WHERE id IN($clause) AND id < ?", $fullArr)->fetchAll();
 if(!$arr) exit('No rows');
 var_export($arr);
 ```
@@ -374,7 +368,7 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
 ```php
 //include mysqli_connect.php
 try {
-  $insert = $mysqli->insert("INSERT INTO myTable (name, age) VALUES (?, ?)", [$_POST['name'], $_POST['age']]);
+  $insert = $mysqli->query("INSERT INTO myTable (name, age) VALUES (?, ?)", [$_POST['name'], $_POST['age']]);
 } catch (Exception $e) {
   error_log($e);
   exit('Error inserting');
@@ -389,7 +383,7 @@ set_exception_handler(function($e) {
   error_log($e);
   exit('Error inserting');
 });
-$insert = $mysqli->insert("INSERT INTO myTable (name, age) VALUES (?, ?)", [$_POST['name'], $_POST['age']]);
+$insert = $mysqli->query("INSERT INTO myTable (name, age) VALUES (?, ?)", [$_POST['name'], $_POST['age']]);
 ```
 
 # Documentation
@@ -419,72 +413,10 @@ new SimpleMySQLi(string $host, string $username, string $password, string $dbNam
 - **SimpleMySQLiException** if `$defaultFetchType` specified isn't one of the allowed fetch modes
 - **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
 
-## Insert Function
+## query()
 
 ```php
-function insert(string $sql, array $values, bool $getInsertId = false, string $types = '')
-```
-
-**Parameters**
-
-- **string $sql** - SQL query
-- **array $values** - values or variables to bind to query
-- **bool $getInsertId = false** (optional) - if true, returns the primary key of the latest inserted rows in an object with affectedRows and insertId
-- **string $types = ''** (optional) - variable type for each bound value/variable
-
-**Returns**
-
-- **an object that can be called with $insert->affected_rows**
-- **an object that can be called $insert->affected_rows and $insert->insert_id** if `$getInsertId = true`
-
-**Throws**
-
-- **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
-
-## Update Function
-
-```php
-function update(string $sql, array $values, string $types = '')
-```
-
-**Parameters**
-
-- **string $sql** - SQL query
-- **array $values** - values or variables to bind to query
-- **string $types = ''** (optional) - variable type for each bound value/variable
-
-**Returns**
-
-- **an object that can be called with $update->affected_rows**
-
-**Throws**
-
-- **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
-
-## Delete Function
-
-```php
-function delete(string $sql, array $values, string $types = '')
-```
-
-**Parameters**
-
-- **string $sql** - SQL query
-- **array $values** - values or variables to bind to query
-- **string $types = ''** (optional) - variable type for each bound value/variable
-
-**Returns**
-
-- **an object that can be called with $delete->affected_rows**
-
-**Throws**
-
-- **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
-
-## Select Function
-
-```php
-function select(string $sql, array $values = [], string $types = '')
+function query(string $sql, array $values = [], string $types = '')
 ```
 
 **Parameters**
@@ -495,13 +427,49 @@ function select(string $sql, array $values = [], string $types = '')
 
 **Description**
 
-Used to get the result, but needs to be used with either `fetch()` for single row and loop fetching or `fetchAll()` for fetching all results.
+All queries go here. If select statement, needs to be used with either `fetch()` for single row and loop fetching or `fetchAll()` for fetching all results.
 
 **Throws**
 
 - **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
 
-## Fetch Function
+## affectedRows()
+
+```php
+function affectedRows()
+```
+
+**Description**
+
+Get affected rows
+
+**Returns**
+
+- **$mysqli->affected_rows**
+
+**Throws**
+
+- **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
+
+## insertId()
+
+```php
+function insertId()
+```
+
+**Description**
+
+Get the latest primary key inserted
+
+**Returns**
+
+- **$mysqli->insert_id**
+
+**Throws**
+
+- **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
+
+## fetch()
 
 ```php
 function fetch(string $fetchType = '')
@@ -519,7 +487,7 @@ Fetch one row at a time
 
 - **1 array row of `$fetchType` specified**
 - **Scalar** If 'col' type selected
-- NULL if at the end of loop (same behavior as vanilla MySQLi)
+- **NULL** if at the end of loop (same behavior as vanilla MySQLi)
 
 **Throws**
 
@@ -528,7 +496,7 @@ Fetch one row at a time
   - If fetch mode specification is violated
 - **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
 
-## FetchAll Function
+## fetchAll()
 
 ```php
 function fetchAll(string $fetchType = '')
@@ -558,7 +526,7 @@ Fetch all results in array
   - If fetch mode specification is violated
 - **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
 
-## Transaction Function
+## transaction()
 
 ```php
 function transaction(array|string $sql, array $values, array $types = [])
@@ -575,7 +543,7 @@ function transaction(array|string $sql, array $values, array $types = [])
 - **SimpleMySQLiException** If there is a mismatch in parameter values, parameter types or SQL
 - **mysqli_sql_exception** If transaction failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
 
-## Close Function
+## close()
 
 ```php
 function close()

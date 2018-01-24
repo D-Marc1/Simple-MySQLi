@@ -8,6 +8,7 @@ class SimpleMySQLiException extends Exception {}
 class SimpleMySQLi {
 	private $mysqli;
 	private $stmtResult; //used to store get_result()
+	private $stmt;
 	private $defaultFetchType;
 	private const ALLOWED_FETCH_TYPES_BOTH = [
 		'assoc', 'obj', 'num', 'col'
@@ -45,74 +46,38 @@ class SimpleMySQLi {
 	}
 
 	/**
-	 * @param string $sql SQL query
-	 * @param array $values Values or variables to bind to query
-	 * @param bool $getInsertId (optional) Returns the latest primary key in object if true
-	 * @param string $types (optional) Variable type for each bound value/variable
-	 * @return object Only affected rows by default. If $getInsertId is true, then also the latest primary key
-	 * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
-	 */
-	public function insert(string $sql, array $values, bool $getInsertId = false, string $types = '') {
-		if(!$types) $types = str_repeat('s', count($values)); //String type for all variables if not specified
-
-		$stmt = $this->mysqli->prepare($sql);
-		$stmt->bind_param($types, ...$values);
-		$stmt->execute();
-		$affectedRows = $stmt->affected_rows;
-		if($getInsertId) $insertId = $this->mysqli->insert_id;
-		$stmt->close();
-
-		if($getInsertId) return (object)['affected_rows' => $affectedRows, 'insert_id' => $insertId];
-		else return (object)['affected_rows' => $affectedRows];
-	}
-
-	/**
-	 * @param string $sql SQL query
-	 * @param array $values Values or variables to bind to query
-	 * @param string $types (optional) Variable type for each bound value/variable
-	 * @return object Affected rows
-	 * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
-	 */
-	public function update(string $sql, array $values, string $types = '') {
-		if(!$types) $types = str_repeat('s', count($values)); //String type for all variables if not specified
-
-		$stmt = $this->mysqli->prepare($sql);
-		$stmt->bind_param($types, ...$values);
-		$stmt->execute();
-		$affectedRows = $stmt->affected_rows;
-		$stmt->close();
-
-		return (object)['affected_rows' => $affectedRows];
-	}
-
-	/**
-	 * Both update() and delete() are exactly the same.
-	 * @param string $sql SQL query
-	 * @param array $values Values or variables to bind to query
-	 * @param string $types (optional) Variable type for each bound value/variable
-	 * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
-	 */
-	public function delete(string $sql, array $values, string $types = '') {
-		return $this->update($sql, $values, $types);
-	}
-
-	/**
-	 * Used to get the result, but needs to be used with either `fetch()` for single row and loop fetching or `fetchAll()` for fetching all results
+	 * All queries go here. If select statement, needs to be used with either `fetch()` for single row and loop fetching or
+	 *`fetchAll()` for fetching all results.
 	 * @param string $sql SQL query
 	 * @param array $values (optional) Values or variables to bind to query. Can be empty for selecting all rows
 	 * @param string $types (optional) Variable type for each bound value/variable
 	 * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
-	public function select(string $sql, array $values = [], string $types = '') {
+	public function query(string $sql, array $values = [], string $types = '') {
 		if(!$types) $types = str_repeat('s', count($values)); //String type for all variables if not specified
 
-		$stmt = $this->mysqli->prepare($sql);
+		$stmt = $this->stmt = $this->mysqli->prepare($sql);
 		if($values) $stmt->bind_param($types, ...$values);
 		$stmt->execute();
 		$this->stmtResult = $stmt->get_result();
-		$stmt->close();
 
 		return $this;
+	}
+
+	/**
+	 * Get affected rows
+	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
+	 */
+	public function affectedRows() {
+		return $this->mysqli->affected_rows;
+	}
+
+	/**
+	 * Get the latest primary key inserted
+	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
+	 */
+	public function insertId() {
+		return $this->mysqli->insert_id;
 	}
 
 	/**

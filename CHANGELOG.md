@@ -1,5 +1,10 @@
 # Changelog
 
+- [**1.3.0**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.3.0) - January 24, 2018
+
+  - All queries now use a global `query()` functions
+  - `affectedRows()` and `insertId()` added as separate functions instead of returned in object due to switching to `query`
+
 - [**1.2.0**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.2.0) - January 18, 2018
 
   - Select statements now must be chained with `fetch()` for one row at a time and `fetchAll()` for all results
