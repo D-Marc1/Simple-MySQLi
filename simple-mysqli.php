@@ -163,11 +163,12 @@ class SimpleMySQLi {
 			}
 		}
 		else if($fetchType === 'keyPairArr' || $fetchType === 'group') {
-			while($row = $stmtResult->fetch_row()) {
-				$firstCol = $row[0];
-				unset($row[0]);
-				if($fetchType === 'keyPairArr') $arr[$firstCol] = $row;
-				else if($fetchType === 'group') $arr[$firstCol][] = $row;
+			$firstColName = $stmtResult->fetch_field_direct(0)->name;
+			while($row = $stmtResult->fetch_assoc()) {
+				$firstColVal = $row[$firstColName];
+				unset($row[$firstColName]);
+				if($fetchType === 'keyPairArr') $arr[$firstColVal] = $row;
+				else if($fetchType === 'group') $arr[$firstColVal][] = $row;
 			}
 		}
 
