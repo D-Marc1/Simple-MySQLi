@@ -55,7 +55,6 @@ PHP 7.0+
   - [affectedRows()](#affectedrows)
   - [affectedRowsInfo()](#affectedrowsinfo)
   - [insertId()](#insertid)
-  - [query()](#query)
   - [fetch()](#fetch)
   - [fetchAll()](#fetchall)
   - [transaction()](#transaction)
@@ -106,7 +105,7 @@ echo $insert->insertId(); //Can be $mysqli->insertId()
 ```php
 $update = $mysqli->query("UPDATE myTable SET name = ? WHERE id = ?", [$_POST['name'], $_SESSION['id']]);
 echo $update->affectedRows(); //Can be $mysqli->affectedRows()
-echo $update->affectedRowsInfo(); //For more specific version. Can be $mysqli->affectedRows()
+var_export($update->affectedRowsInfo()); //For more specific version. Can be $mysqli->affectedRowsInfo()
 ```
 
 ## Delete
