@@ -66,6 +66,7 @@ class SimpleMySQLi {
 
 	/**
 	 * Get affected rows
+	 * @return int $mysqli->affected_rows
 	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
 	public function affectedRows() {
@@ -73,7 +74,19 @@ class SimpleMySQLi {
 	}
 
 	/**
+	 * A more specific version of affectedRows() to give you more info what happened. Uses $mysqli::info under the hood
+	 * Can be used for the following cases http://php.net/manual/en/mysqli.info.php
+	 * @return array Associative array converted from result string
+	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
+	 */
+	public function affectedRowsInfo() {
+		preg_match_all('/(\S[^:]+): (\d+)/', $this->mysqli->info, $matches);
+    return array_combine($matches[1], $matches[2]);
+	}
+
+	/**
 	 * Get the latest primary key inserted
+	 * @return int $mysqli->insert_id
 	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
 	public function insertId() {
@@ -108,6 +121,8 @@ class SimpleMySQLi {
 			}
 			$row = $stmtResult->fetch_row()[0];
 		}
+
+		$stmtResult->free();
 
 		return $row;
 	}
@@ -171,6 +186,8 @@ class SimpleMySQLi {
 				else if($fetchType === 'group') $arr[$firstColVal][] = $row;
 			}
 		}
+
+		$stmtResult->free();
 
 		return $arr;
 	}

@@ -1,5 +1,9 @@
 # Changelog
 
+- [**1.3.2**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.3.2) - January 25, 2018
+
+  - Add affectedRowsInfo and free fetch results
+
 - [**1.3.1**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.3.1) - January 24, 2018
 
   - Fix `fetchAll()` types `keyPairArr` and `group`

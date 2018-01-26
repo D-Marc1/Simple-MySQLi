@@ -51,12 +51,13 @@ PHP 7.0+
     - [Same Template, Different Values](#same-template-different-values)
 - [Documentation](#documentation)
   - [Constructor](#constructor)
-  - [insert()](#insert)
-  - [update()](#update)
-  - [delete()](#delete)
-  - [select()](#select)
+  - [query()](#query)
+  - [affectedRows()](#affectedrows)
+  - [affectedRowsInfo()](#affectedrowsinfo)
+  - [insertId()](#insertid)
+  - [query()](#query)
   - [fetch()](#fetch)
-  - [fetchAll()](#fetchAll)
+  - [fetchAll()](#fetchall)
   - [transaction()](#transaction)
   - [close()](#close)
 - [Changelog](#changelog)
@@ -105,6 +106,7 @@ echo $insert->insertId(); //Can be $mysqli->insertId()
 ```php
 $update = $mysqli->query("UPDATE myTable SET name = ? WHERE id = ?", [$_POST['name'], $_SESSION['id']]);
 echo $update->affectedRows(); //Can be $mysqli->affectedRows()
+echo $update->affectedRowsInfo(); //For more specific version. Can be $mysqli->affectedRows()
 ```
 
 ## Delete
@@ -446,6 +448,24 @@ Get affected rows
 **Returns**
 
 - **$mysqli->affected_rows**
+
+**Throws**
+
+- **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
+
+## affectedRowsInfo()
+
+```php
+function affectedRows()
+```
+
+**Description**
+
+A more specific version of affectedRows() to give you more info what happened. Uses $mysqli::info under the hood. Can be used for the [following cases](http://php.net/manual/en/mysqli.info.php)
+
+**Returns**
+
+- **Associative array converted from result string**
 
 **Throws**
 
