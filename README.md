@@ -23,7 +23,7 @@ The purpose of this class is to keep things as simple as possible, while account
 
 # Supported Versions
 
-PHP 7.0+
+PHP 7.1+
 
 # Table of Contents
 
@@ -455,7 +455,7 @@ Get affected rows
 ## affectedRowsInfo()
 
 ```php
-function affectedRows()
+function affectedRowsInfo()
 ```
 
 **Description**
