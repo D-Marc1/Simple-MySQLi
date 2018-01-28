@@ -81,7 +81,7 @@ class SimpleMySQLi {
 	 */
 	public function affectedRowsInfo() {
 		preg_match_all('/(\S[^:]+): (\d+)/', $this->mysqli->info, $matches);
-    return array_combine($matches[1], $matches[2]);
+		return array_combine($matches[1], $matches[2]);
 	}
 
 	/**
@@ -121,8 +121,6 @@ class SimpleMySQLi {
 			}
 			$row = $stmtResult->fetch_row()[0];
 		}
-
-		$stmtResult->free();
 
 		return $row;
 	}
