@@ -50,6 +50,7 @@ PHP 7.1+
     - [With Other Placeholders](#with-other-placeholders)
   - [Transactions](#transactions)
     - [Same Template, Different Values](#same-template-different-values)
+	- [Transactions with Callbacks](#transactions-with-callbacks)
 - [Documentation](#documentation)
   - [Constructor](#constructor)
   - [query()](#query)
