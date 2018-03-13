@@ -38,7 +38,7 @@ PHP 7.1+
     - [Fetch Array of Objects](#fetch-array-of-objects)
     - [Fetch Single Row](#fetch-single-row)
     - [Fetch Single Row Like bind_result()](#fetch-single-row-like-bind_result)
-    - [Fetch Scalar (Single Value)](#fetch-scalar-single-value))
+    - [Fetch Scalar (Single Value)](#fetch-scalar-single-value)
     - [Fetch Single Column as Array](#fetch-single-column-as-array)
     - [Fetch Each Column as Separate Array Variable](#fetch-each-column-as-separate-array-variable)
     - [Fetch Key-Pair](#fetch-key-pair)
