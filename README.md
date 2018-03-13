@@ -348,7 +348,7 @@ var_export($arr);
 
 ## Transactions
 
-This is probably my favorite aspect of this class, since the difference in terms of lines of code is absurd.
+This is probably my favorite aspect of this class, since the difference in terms of lines of code is absurd. This will also automatically rollback if `affectedRows()` is less than one, in case zero rows are affected, which wouldn't trigger an exception. If any error occurs, it will append the message to your error log.
 
 ```php
 $sql[] = "INSERT INTO myTable (name, age) VALUES (?, ?)";
@@ -368,9 +368,9 @@ $mysqli->transaction($sql, $arrOfValues);
 
 ### Transactions with Callbacks
 
-The regular way of doing transactions in Simple MySQLi is exceedingly concise and can be used in most cases. However, sometimes you might want a little more control. For instance, under the hood, it only if each query is greater than one. This isn't suitable for a query like INSERT multiple or DELETE/UPDATE query that affects multiple rows. 
+The regular way of doing transactions in Simple MySQLi is exceedingly concise and can be used in most cases. However, sometimes you might want a little more control. For instance, under the hood, it only checks if each query's `affectedRows()` is greater than one. This isn't suitable for a query like INSERT multiple or DELETE/UPDATE query that affects multiple rows. 
 
-There's no need to start the transaction, nor deal with rollback. If you want to rollback, simply throw an exception, and it'll rollback for you, while printing the exception solely in the error log. Execute allows you to efficiently reuse your prepared statement with different values.
+There's also no need to start the transaction, nor deal with rollbacks. If you want to rollback, simply throw an exception, and it'll rollback for you, while printing the exception solely in the error log. Execute allows you to efficiently reuse your prepared statement with different values.
 
 ```php
 $mysqli->transactionCallback(function($mysqli) {
