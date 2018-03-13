@@ -363,11 +363,11 @@ There's no need to start the transaction, nor deal with rollback. If you want to
 
 ```php
 $mysqli->transactionCallback(function($mysqli) {
-	$insert = $mysqli->query("INSERT INTO table (sender, receiver) VALUES (?, ?)", [28, 330]);
-	if($insert->affectedRows() < 1) throw new Exception('Error inserting');
-	echo $insert->insertId();
-	$insert->execute([243, 49]); //reuse same insert query
-	$delete = $mysqli->query("DELETE FROM table WHERE max_bench < ?", [125]);
+  $insert = $mysqli->query("INSERT INTO table (sender, receiver) VALUES (?, ?)", [28, 330]);
+  if($insert->affectedRows() < 1) throw new Exception('Error inserting');
+  echo $insert->insertId();
+  $insert->execute([243, 49]); //reuse same insert query
+  $delete = $mysqli->query("DELETE FROM table WHERE max_bench < ?", [125]);
 });
 ```
 
@@ -494,7 +494,7 @@ Create correct number of questions marks for `WHERE IN()` array.
 
 **Parameters**
 
-- **array $inArr = []** (optional) - array used in WHERE IN clause
+- **array $inArr = []** - array used in WHERE IN clause
 
 **Returns**
 
@@ -617,7 +617,7 @@ Fetch all results in array
 
 **Parameters**
 
-- **string $fetchType = ''** (optional) - This overrides the default fetch type set in the constructor. Check [here](#constructor) for possible values. `FetchAll()` also has additional fetch modes:
+- **string $fetchType = ''** (optional) - This overrides the default fetch type set in the constructor. Check [here](#constructor) for possible values. `fetchAll()` also has additional fetch modes:
   - **'keyPair'** - Unique key (1st column) to single value (2nd column). Same as `PDO::FETCH_KEY_PAIR`
   - **'keyPairArr'** - Unique key (1st column) to array. Same as `PDO::FETCH_UNIQUE`
   - **'group'** - Group by common values in the 1st column into associative subarrays. Same as `PDO::FETCH_GROUP`
