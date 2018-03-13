@@ -9,10 +9,11 @@ On a side note, if you'd like to know how to use MySQLi the "vanilla way", check
 # Why Should I Use Simple MySQLi?
 
 - Concise Code
+- Awesome fetch modes
 - SQL queries are the same
 - Accounts for most common uses
 - Variable type is optional
-- Bind variables *and* values (not sure how useful this is though)
+- Bind variables and values (not sure how useful this is though)
 
 # Why Not Use It?
 
@@ -52,13 +53,19 @@ PHP 7.1+
 - [Documentation](#documentation)
   - [Constructor](#constructor)
   - [query()](#query)
+	- [execute()](#execute)
+	- [whereIn()](#wherein)
+	- [numRows()](#numrows)
   - [affectedRows()](#affectedrows)
   - [affectedRowsInfo()](#affectedrowsinfo)
   - [insertId()](#insertid)
   - [fetch()](#fetch)
   - [fetchAll()](#fetchall)
   - [transaction()](#transaction)
-  - [close()](#close)
+	- [transactionCallback()](#transactioncallback)
+	- [freeResult()](#freeresult)
+  - [closeStmt()](#closestmt)
+	- [close()](#close)
 - [Changelog](#changelog)
 
 # Examples
@@ -73,7 +80,7 @@ One of the aspects of MySQLi I actually like a lot is the fact that error report
 
 ```php
 try {
-  $mysqli = new SimpleMySQLi("localhost", "username", "password", "dbName", "utf8", "assoc");
+  $mysqli = new SimpleMySQLi("localhost", "username", "password", "dbName", "utf8mb4", "assoc");
 } catch(Exception $e) {
   error_log($e->getMessage());
   exit('Someting weird happened'); //Should be a message a typical user could understand
@@ -82,14 +89,14 @@ try {
 
 **Custom Exception Handler**
 
-This is pretty neat, since you can avoid nesting. It is commonly used to redirect to a single error page, but can be used like the following as well. You can reassign this to give specific messages on your AJAX pages as well.
+This is pretty neat, since you can avoid nesting. It is commonly used to redirect to a single error page, but can be used like the following as well. You can reassign this to give specific messages on your AJAX pages as well. This will catch all of your exceptions on each page this is used on. So you'll either have to call `set_exception_handler()` on each page or use `restore_exception_handler()` to revert to the previous one.
 
 ```php
 set_exception_handler(function($e) {
   error_log($e->getMessage());
   exit('Someting weird happened'); //Should be a message a typical user could understand
 });
-$mysqli = new SimpleMySQLi("localhost", "username", "password", "dbName", "utf8", "assoc");
+$mysqli = new SimpleMySQLi("localhost", "username", "password", "dbName", "utf8mb4", "assoc");
 ```
 
 ## Insert
@@ -112,7 +119,7 @@ var_export($update->affectedRowsInfo()); //For more specific version. Can be $my
 
 ```php
 $delete = $mysqli->query("DELETE FROM myTable WHERE id = ?", [$_SESSION['id']]);
-echo $delete->affectedRow(); //Can be $mysqli->affectedRows()
+echo $delete->affectedRows(); //Can be $mysqli->affectedRows()
 ```
 
 ## Select
@@ -311,7 +318,7 @@ var_export($arr);
 
 ```php
 $inArr = [12, 23, 44];
-$clause = implode(',', array_fill(0, count($inArr), '?'));
+$clause = whereIn($inArr); //Create question marks
 $arr = $mysqli->query("SELECT event_name, description, location FROM events WHERE id IN($clause)", $inArr)->fetchAll();
 if(!$arr) exit('No rows');
 var_export($arr);
@@ -321,8 +328,8 @@ var_export($arr);
 
 ```php
 $inArr = [12, 23, 44];
-$clause = implode(',', array_fill(0, count($inArr), '?'));
-$fullArr = array_merge($inArr, [5]);
+$clause = whereIn($inArr); //Create question marks
+$fullArr = array_merge($inArr, [5]); //Merge WHERE IN questions marks with rest of query
 $arr = $mysqli->query("SELECT event_name, description, location FROM events WHERE id IN($clause) AND id < ?", $fullArr)->fetchAll();
 if(!$arr) exit('No rows');
 var_export($arr);
@@ -342,12 +349,26 @@ $mysqli->transaction($sql, $arrOfValues);
 
 ### Same Template, Different Values
 
-Unfortunately, I wasn't able to figure out a good way to do this the efficient method of simply reassigning the variable name. I don't think this is an extremely common use case anyway, but perhaps in the future I'll think of a good way to implement it. It's still extremely short code and I doubt anyone would seriously notice a huge performance difference anyway.
-
 ```php
 $sql = "INSERT INTO myTable (name, age) VALUES (?, ?)";
 $arrOfValues = [[$_POST['name'], $_POST['age']], ['Pablo', 34], [$_POST['name'], 22]];
 $mysqli->transaction($sql, $arrOfValues);
+```
+
+## Transactions with Callbacks
+
+The regular way of doing transactions in Simple MySQLi is exceedingly concise and can be used in most cases. However, sometimes you might want a little more control. For instance, under the hood, it only if each query is greater than one. This isn't suitable for a query like INSERT multiple or DELETE/UPDATE query that affects multiple rows. 
+
+There's no need to start the transaction, nor deal with rollback. If you want to rollback, simply throw an exception, and it'll rollback for you, while printing the exception solely in the error log. Execute allows you to efficiently reuse your prepared statement with different values.
+
+```php
+$mysqli->transactionCallback(function($mysqli) {
+	$insert = $mysqli->query("INSERT INTO table (sender, receiver) VALUES (?, ?)", [28, 330]);
+	if($insert->affectedRows() < 1) throw new Exception('Error inserting');
+	echo $insert->insertId();
+	$insert->execute([243, 49]); //reuse same insert query
+	$delete = $mysqli->query("DELETE FROM table WHERE max_bench < ?", [125]);
+});
 ```
 
 ## Error Handling
@@ -392,7 +413,7 @@ $insert = $mysqli->query("INSERT INTO myTable (name, age) VALUES (?, ?)", [$_POS
 ## Constructor
 
 ```php
-new SimpleMySQLi(string $host, string $username, string $password, string $dbName, string $charset = 'utf8', string $defaultFetchType = 'assoc')
+new SimpleMySQLi(string $host, string $username, string $password, string $dbName, string $charset = 'utf8mb4', string $defaultFetchType = 'assoc')
 ```
 
 **Parameters**
@@ -401,7 +422,7 @@ new SimpleMySQLi(string $host, string $username, string $password, string $dbNam
 - **string $username** - Database username
 - **string $password** - Database password
 - **string $dbName** - Database name
-- **string $charset = 'utf8'** (optional) - Default character encoding
+- **string $charset = 'utf8mb4'** (optional) - Default character encoding
 - **string defaultFetchType = 'assoc'** (optional) - Default fetch type. Can be:
   - **'assoc'** - Associative array
   - **'obj'** - Object array
@@ -420,19 +441,88 @@ new SimpleMySQLi(string $host, string $username, string $password, string $dbNam
 function query(string $sql, array $values = [], string $types = '')
 ```
 
+**Description**
+
+All queries go here. If select statement, needs to be used with either `fetch()` for single row and loop fetching or `fetchAll()` for fetching all results.
+
 **Parameters**
 
 - **string $sql** - SQL query
 - **array $values = []** (optional) - values or variables to bind to query; can be empty for selecting all rows
 - **string $types = ''** (optional) - variable type for each bound value/variable
 
-**Description**
+**Returns**
 
-All queries go here. If select statement, needs to be used with either `fetch()` for single row and loop fetching or `fetchAll()` for fetching all results.
+`$this`
 
 **Throws**
 
 - **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
+
+## execute()
+
+```php
+function execute(array $values = [], string $types = '')
+```
+
+**Description**
+
+Used in order to be more efficient if same SQL is used with different values
+
+**Parameters**
+
+- **array $values = []** (optional) - values or variables to bind to query; can be empty for selecting all rows
+- **string $types = ''** (optional) - variable type for each bound value/variable
+
+**Returns**
+
+`$this`
+
+**Throws**
+
+- **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
+
+## whereIn()
+
+```php
+function whereIn(array $inArr)
+```
+
+**Description**
+
+Create correct number of questions marks for `WHERE IN()` array.
+
+**Parameters**
+
+- **array $inArr = []** (optional) - array used in WHERE IN clause
+
+**Returns**
+
+Correct number of question marks
+
+**Throws**
+
+- **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
+
+
+## numRows()
+
+```php
+function numRows()
+```
+
+**Description**
+
+Get number of rows from SELECT.
+
+**Returns**
+
+- **$mysqli->num_rows**
+
+**Throws**
+
+- **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
+
 
 ## affectedRows()
 
@@ -442,7 +532,7 @@ function affectedRows()
 
 **Description**
 
-Get affected rows
+Get affected rows. Can be used instead of numRows() in SELECT
 
 **Returns**
 
@@ -561,6 +651,52 @@ function transaction(array|string $sql, array $values, array $types = [])
 
 - **SimpleMySQLiException** If there is a mismatch in parameter values, parameter types or SQL
 - **mysqli_sql_exception** If transaction failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
+
+## transactionCallback()
+
+```php
+function transactionCallback(callable $callback($this))
+```
+
+**Description**
+
+Do stuff inside of transaction
+
+**Parameters**
+
+- **callable $callback($this)** - Closure to do transaction operations inside. Parameter value is `$this`
+
+**Throws**
+
+- **mysqli_sql_exception** If transaction failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
+
+## freeResult()
+
+```php
+function freeResult()
+```
+
+**Description**
+
+Frees MySQL result
+
+**Throws**
+
+- **mysqli_sql_exception** If mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
+
+## closeStmt()
+
+```php
+function closeStmt()
+```
+
+**Description**
+
+Closes MySQL prepared statement
+
+**Throws**
+
+- **mysqli_sql_exception** If mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
 
 ## close()
 

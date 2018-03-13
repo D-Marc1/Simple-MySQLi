@@ -1,5 +1,11 @@
 # Changelog
 
+- [**1.4.0**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.3.2) - March 13, 2018
+
+  - Add `execute()`, `whereIn()`, `numRows()`, `transactionCallback()`, `freeResult()`, `closeStmt()`
+	- Default charset is now 'utf8mb4' instead of 'utf8'
+	- Don't automatically free result anymore on fetchAll()
+
 - [**1.3.2**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.3.2) - January 25, 2018
 
   - Add affectedRowsInfo and free fetch results
