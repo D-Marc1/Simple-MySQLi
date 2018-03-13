@@ -1,6 +1,6 @@
 # Changelog
 
-- [**1.4.0**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.3.2) - March 13, 2018
+- [**1.4.0**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.4.0) - March 13, 2018
 
   - Add `execute()`, `whereIn()`, `numRows()`, `transactionCallback()`, `freeResult()`, `closeStmt()`
 	- Default charset is now 'utf8mb4' instead of 'utf8'
