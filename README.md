@@ -56,7 +56,7 @@ PHP 7.1+
   - [query()](#query)
   - [execute()](#execute)
   - [whereIn()](#wherein)
- - [numRows()](#numrows)
+  - [numRows()](#numrows)
   - [affectedRows()](#affectedrows)
   - [affectedRowsInfo()](#affectedrowsinfo)
   - [insertId()](#insertid)
