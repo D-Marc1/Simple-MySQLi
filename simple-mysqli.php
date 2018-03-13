@@ -141,13 +141,14 @@ class SimpleMySQLi {
 	/**
 	* Fetch one row at a time
 	*
-	* @param string $fetchType (optional) This overrides the default fetch type set in the constructor. Can be an default type
+	* @param string $fetchType (optional) This overrides the default fetch type set in the constructor
+	* @param string $className (optional) Class name to fetch into if 'obj' $fetchType
 	* @return mixed Array of either fetch type specified or default fetch mode. Can be a scalar too. Null if no more rows
 	* @throws SimpleMySQLiException If $fetchType specified isn't one of the allowed fetch modes in $defaultFetchType
 	*                               If fetch mode specification is violated
 	* @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	*/
-	public function fetch(string $fetchType = '', $className = '') {
+	public function fetch(string $fetchType = '', string $className = '') {
 		$stmtResult = $this->stmtResult;
 		$row = [];
 
@@ -184,12 +185,13 @@ class SimpleMySQLi {
 	*               'keyPairArr' - Unique key (1st column) to array. Same as PDO::FETCH_UNIQUE
 	*               'group' - Group by common values in the 1st column into associative subarrays. Same as PDO::FETCH_GROUP
 	*               'groupCol' - Group by common values in the 1st column into 1D subarray. Same as PDO::FETCH_GROUP | PDO::FETCH_COLUMN
+	* @param string $className (optional) Class name to fetch into if 'obj' $fetchType
 	* @return array Full array of $fetchType specified; [] if no rows
 	* @throws SimpleMySQLiException If $fetchType specified isn't one of the allowed fetch modes in $defaultFetchType
 	*                               If fetch mode specification is violated
 	* @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	*/
-	public function fetchAll(string $fetchType = '', $className = '') {
+	public function fetchAll(string $fetchType = '', string $className = '') {
 		$stmtResult = $this->stmtResult;
 		$arr = [];
 

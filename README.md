@@ -2,7 +2,7 @@
 
 Using MySQLi prepared statements is a great way to prevent against SQL injection, but it can start feeling tedious after a while. I thought this could be improved a little, which is why wanted to create a highly abstracted MySQLi database wrapper, while also ensuring that the SQL queries aren't broken up into proprietary syntactic sugar chaining. This way, so you can have extremely concise code, while still keeping your SQL syntax intact. I'll concede that I'm slightly reinventing the wheel, as there are already some wrappers with similarities to mine, but I figured I'd make an extremely lightweight, yet powerful enough one for most people to use.
 
-I specifically chose MySQLi over PDO in case I decide to add any of the MySQL-specific features it has in the future, like asynchronous queries for instance. Currently, I'm not using any, but I wanted to keep the option open.
+I specifically chose MySQLi over PDO to have the versatiliy to use MySQL-specific features. Currently, the only ones I'm using are [mysqli::info](http://php.net/manual/en/mysqli.info.php) and proper closing/freeing methods. Unfortunately, asynchronous queries don't have support for prepared statements yet, so I'll wait until they do to implement them.
 
 On a side note, if you'd like to know how to use MySQLi the "vanilla way", check out [this tutorial on MySQLi Prepared Statements](https://websitebeaver.com/prepared-statements-in-php-mysqli-to-prevent-sql-injection).
 
@@ -38,7 +38,7 @@ PHP 7.1+
     - [Fetch Array of Objects](#fetch-array-of-objects)
     - [Fetch Single Row](#fetch-single-row)
     - [Fetch Single Row Like bind_result()](#fetch-single-row-like-bind_result)
-    - [Fetch Single Row, Single Column (Scalar)](#fetch-single-row-single-column-scalar)
+    - [Fetch Scalar (Single Value)](#fetch-scalar-single-value))
     - [Fetch Single Column as Array](#fetch-single-column-as-array)
     - [Fetch Each Column as Separate Array Variable](#fetch-each-column-as-separate-array-variable)
     - [Fetch Key-Pair](#fetch-key-pair)
@@ -50,7 +50,7 @@ PHP 7.1+
     - [With Other Placeholders](#with-other-placeholders)
   - [Transactions](#transactions)
     - [Same Template, Different Values](#same-template-different-values)
-	- [Transactions with Callbacks](#transactions-with-callbacks)
+    - [Transactions with Callbacks](#transactions-with-callbacks)
 - [Documentation](#documentation)
   - [Constructor](#constructor)
   - [query()](#query)
@@ -184,12 +184,22 @@ list($id, $name, $age) = $arr;
 echo $age; //Output 34
 ```
 
-### Fetch Single Row, Single Column (Scalar)
+### Fetch Scalar (Single Value)
+
+This is an ideal way of fetching a scalar. Using the MySQL `COUNT` function gives you a number, so you can easily check for truthiness, as no rows would give you a value of **0**.
 
 ```php
 $count = $mysqli->query("SELECT COUNT(*) FROM myTable WHERE name = ?", [$_POST['name']])->fetch("col");
 if(!$count) exit('No rows');
 echo $count; //Output: 284
+```
+
+But what if you were to fetch a single value from your database in scenario where the column could have a boolean value, like **NULL** or **0**? This would make it impossible to distinguish between no rows or a falsy values. This is why I'd suggest using `numRows()` in every other case instead.
+
+```php
+$favoriteSport = $mysqli->query("SELECT favorite_sport FROM myTable WHERE id = ?", [23])->fetch("col");
+if($favoriteSport->numRows() < 1) exit('No rows');
+echo $favoriteSport; //Output: 'basketball'
 ```
 
 ### Fetch Single Column as Array
@@ -356,7 +366,7 @@ $arrOfValues = [[$_POST['name'], $_POST['age']], ['Pablo', 34], [$_POST['name'],
 $mysqli->transaction($sql, $arrOfValues);
 ```
 
-## Transactions with Callbacks
+### Transactions with Callbacks
 
 The regular way of doing transactions in Simple MySQLi is exceedingly concise and can be used in most cases. However, sometimes you might want a little more control. For instance, under the hood, it only if each query is greater than one. This isn't suitable for a query like INSERT multiple or DELETE/UPDATE query that affects multiple rows. 
 
@@ -364,11 +374,11 @@ There's no need to start the transaction, nor deal with rollback. If you want to
 
 ```php
 $mysqli->transactionCallback(function($mysqli) {
-  $insert = $mysqli->query("INSERT INTO table (sender, receiver) VALUES (?, ?)", [28, 330]);
+  $insert = $mysqli->query("INSERT INTO myTable (sender, receiver) VALUES (?, ?)", [28, 330]);
   if($insert->affectedRows() < 1) throw new Exception('Error inserting');
   echo $insert->insertId();
   $insert->execute([243, 49]); //reuse same insert query
-  $delete = $mysqli->query("DELETE FROM table WHERE max_bench < ?", [125]);
+  $delete = $mysqli->query("DELETE FROM myTable WHERE max_bench < ?", [125]);
 });
 ```
 
@@ -495,7 +505,7 @@ Create correct number of questions marks for `WHERE IN()` array.
 
 **Parameters**
 
-- **array $inArr = []** - array used in WHERE IN clause
+- **array $inArr** - array used in WHERE IN clause
 
 **Returns**
 
@@ -582,7 +592,7 @@ Get the latest primary key inserted
 ## fetch()
 
 ```php
-function fetch(string $fetchType = '')
+function fetch(string $fetchType = '', string $className = '')
 ```
 
 **Description**
@@ -592,6 +602,7 @@ Fetch one row at a time
 **Parameters**
 
 - **string $fetchType = ''** (optional) - This overrides the default fetch type set in the constructor. Check [here](#constructor) for possible values
+- **string $className = ''** (optional) - Class name to fetch into if `obj` $fetchType
 
 **Returns**
 
@@ -609,7 +620,7 @@ Fetch one row at a time
 ## fetchAll()
 
 ```php
-function fetchAll(string $fetchType = '')
+function fetchAll(string $fetchType = '', string $className = '')
 ```
 
 **Description**
@@ -623,6 +634,7 @@ Fetch all results in array
   - **'keyPairArr'** - Unique key (1st column) to array. Same as `PDO::FETCH_UNIQUE`
   - **'group'** - Group by common values in the 1st column into associative subarrays. Same as `PDO::FETCH_GROUP`
   - **'groupCol'** - Group by common values in the 1st column into 1D subarray. Same as `PDO::FETCH_GROUP | PDO::FETCH_COLUMN`
+- **string $className = ''** (optional) - Class name to fetch into if `obj` $fetchType
 
 **Returns**
 
