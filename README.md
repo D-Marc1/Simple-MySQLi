@@ -29,9 +29,10 @@ PHP 7.1+
 # Table of Contents
 
 - [Examples](#examples)
-  - [Insert](#insert)
-  - [Update](#update)
-  - [Delete](#delete)
+  - [Insert, Update, Delete](#insert-update-delete)
+    - [Insert](#insert)
+    - [Update](#update)
+    - [Delete](#delete)
   - [Select](#select)
     - [Fetch Each Column as Separate Array Variable](#fetch-each-column-as-separate-array-variable)
     - [Fetch Associative Array](#fetch-associative-array)
