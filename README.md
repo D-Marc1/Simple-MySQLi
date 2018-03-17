@@ -100,23 +100,31 @@ set_exception_handler(function($e) {
 $mysqli = new SimpleMySQLi("localhost", "username", "password", "dbName", "utf8mb4", "assoc");
 ```
 
-## Insert
+## Insert, Update, Delete
+
+### Insert
 
 ```php
 $insert = $mysqli->query("INSERT INTO myTable (name, age) VALUES (?, ?)", [$_POST['name'], $_POST['age']]);
-echo $insert->affectedRows(); //Can be $mysqli->affectedRows()
-echo $insert->insertId(); //Can be $mysqli->insertId()
+echo $insert->affectedRows();
+echo $insert->insertId();
 ```
 
-## Update
+### Update
 
 ```php
 $update = $mysqli->query("UPDATE myTable SET name = ? WHERE id = ?", [$_POST['name'], $_SESSION['id']]);
-echo $update->affectedRows(); //Can be $mysqli->affectedRows()
-var_export($update->affectedRowsInfo()); //For more specific version. Can be $mysqli->affectedRowsInfo()
+echo $update->affectedRows();
+var_export($update->affectedRowsInfo()); //For more specific version
 ```
 
-## Delete
+Here's what `affectedRowsInfo()` would print. This could be useful for checking if you updated your values with the exact same as the old ones.
+
+```php
+['Rows Matched' => 1, 'Changed' => 0, 'Warnings' => 0]
+```
+
+### Delete
 
 ```php
 $delete = $mysqli->query("DELETE FROM myTable WHERE id = ?", [$_SESSION['id']]);
