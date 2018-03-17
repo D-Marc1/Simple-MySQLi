@@ -161,6 +161,16 @@ Output:
 ]
 ```
 
+
+You can even fetch into a new instance of a class.
+
+```php
+class myClass {}
+$arr = $mysqli->query("SELECT id, name, age FROM events WHERE id <= ?", [4])->fetchAll("obj", "myClass");
+if(!$arr) exit('No rows');
+var_export($arr);
+```
+
 ### Fetch Single Row
 
 ```php
@@ -329,7 +339,7 @@ var_export($arr);
 
 ```php
 $inArr = [12, 23, 44];
-$clause = whereIn($inArr); //Create question marks
+$clause = $mysqli->whereIn($inArr); //Create question marks
 $arr = $mysqli->query("SELECT event_name, description, location FROM events WHERE id IN($clause)", $inArr)->fetchAll();
 if(!$arr) exit('No rows');
 var_export($arr);
@@ -339,7 +349,7 @@ var_export($arr);
 
 ```php
 $inArr = [12, 23, 44];
-$clause = whereIn($inArr); //Create question marks
+$clause = $mysqli->whereIn($inArr); //Create question marks
 $fullArr = array_merge($inArr, [5]); //Merge WHERE IN questions marks with rest of query
 $arr = $mysqli->query("SELECT event_name, description, location FROM events WHERE id IN($clause) AND id < ?", $fullArr)->fetchAll();
 if(!$arr) exit('No rows');
