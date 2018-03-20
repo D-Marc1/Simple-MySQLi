@@ -1,5 +1,9 @@
 # Changelog
 
+- [**1.4.1**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.4.1) - March 20, 2018
+
+  - Add `setRowsMatched()` to use rows matched, instead of rows changed on UPDATE query
+
 - [**1.4.0**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.4.0) - March 13, 2018
 
   - Add `execute()`, `whereIn()`, `numRows()`, `transactionCallback()`, `freeResult()`, `closeStmt()`

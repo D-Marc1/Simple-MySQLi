@@ -33,6 +33,7 @@ PHP 7.1+
     - [Insert](#insert)
     - [Update](#update)
     - [Delete](#delete)
+		- [Update Same Values](#update-same-values)
   - [Select](#select)
     - [Fetch Each Column as Separate Array Variable](#fetch-each-column-as-separate-array-variable)
     - [Fetch Associative Array](#fetch-associative-array)
@@ -60,6 +61,7 @@ PHP 7.1+
   - [numRows()](#numrows)
   - [affectedRows()](#affectedrows)
   - [affectedRowsInfo()](#affectedrowsinfo)
+	- [setRowsMatched()](#setrowsmatched)
   - [insertId()](#insertid)
   - [fetch()](#fetch)
   - [fetchAll()](#fetchall)
@@ -116,20 +118,39 @@ echo $insert->insertId();
 ```php
 $update = $mysqli->query("UPDATE myTable SET name = ? WHERE id = ?", [$_POST['name'], $_SESSION['id']]);
 echo $update->affectedRows();
-var_export($update->affectedRowsInfo()); //For more specific version
-```
-
-Here's what `affectedRowsInfo()` would print. This could be useful for checking if you updated your values with the exact same as the old ones.
-
-```php
-['Rows Matched' => 1, 'Changed' => 0, 'Warnings' => 0]
 ```
 
 ### Delete
 
 ```php
 $delete = $mysqli->query("DELETE FROM myTable WHERE id = ?", [$_SESSION['id']]);
-echo $delete->affectedRows(); //Can be $mysqli->affectedRows()
+echo $delete->affectedRows();
+```
+
+### Update Same Values
+
+The problem with `affectedRows()` is that it will literally just tell you if any rows are affected. So if it returned 0, you wouldn't know if that means that the WHERE clause didn't match or that you updated the row with the same values. One solution Simple MySQLi offers is to use affectedRowsInfo(), which utilizes [mysqli::info](http://php.net/manual/en/mysqli.info.php) and converts the result string to an array. You can use this in other queries it supports as well.
+
+```php
+$update = $mysqli->query("UPDATE myTable SET name = ? WHERE id = ?", [$_POST['name'], $_SESSION['id']]);
+echo $update->affectedRows();
+var_export($update->affectedRowsInfo()); //For more specific version
+```
+
+Here's what `affectedRowsInfo()` would print. This could be useful for checking if you updated your values with the exact same as the old ones.
+
+```php
+['Rows matched' => 1, 'Changed' => 0, 'Warnings' => 0]
+```
+
+This is nice and all, but it might be more convenient in some cases to just change the behavior of `affectedRows()` to use rows matched, rather than rows changed.
+
+```php
+$update = $mysqli->query("UPDATE myTable SET name = ? WHERE id = ?", [$_POST['name'], $_SESSION['id']]);
+$mysqli->setRowsMatched(); //Use rows matched
+echo $update->affectedRows(); //0
+$mysqli->setRowsMatched(false); //Revert back to normal. Use rows changed
+echo $update->affectedRows(); //1
 ```
 
 ## Select
@@ -367,7 +388,7 @@ var_export($arr);
 
 ## Transactions
 
-This is probably my favorite aspect of this class, since the difference in terms of lines of code is absurd. This will also automatically rollback if `affectedRows()` is less than one, in case zero rows are affected, which wouldn't trigger an exception. If any error occurs, it will append the message to your error log.
+This is probably my favorite aspect of this class, since the difference in terms of lines of code is absurd. This will also automatically rollback if `affectedRows()` is less than one, in case zero rows are affected, which wouldn't trigger an exception. If any error occurs, it will append the message to your error log. Additionally, it will throw any exception if `affectedRows()` equals zero.
 
 ```php
 $sql[] = "INSERT INTO myTable (name, age) VALUES (?, ?)";
@@ -567,6 +588,7 @@ Get affected rows. Can be used instead of numRows() in SELECT
 **Returns**
 
 - **$mysqli->affected_rows**
+- **Rows Matched** if `setRowsMatched()` is used
 
 **Throws**
 
@@ -585,6 +607,24 @@ A more specific version of affectedRows() to give you more info what happened. U
 **Returns**
 
 - **Associative array converted from result string**
+
+**Throws**
+
+- **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
+
+## setRowsMatched()
+
+```php
+function setRowsMatched(bool $matched = true)
+```
+
+**Description**
+
+If UPDATE query, will use rows matched, instead of rows changed. Useful if updating row with same values
+
+**Parameters**
+
+- **$matched** (optional) -  If true, causes `affectedRows()` to use rows matched, instead of rows changed. False is normal
 
 **Throws**
 
@@ -672,6 +712,10 @@ Fetch all results in array
 ```php
 function transaction(array|string $sql, array $values, array $types = [])
 ```
+
+**Description**
+
+Just a normal transaction that will automatically rollback and print your message to your error log. Will also rollback if `affectedRows()` is less than 1.
 
 **Parameters**
 

@@ -10,6 +10,7 @@ class SimpleMySQLi {
 	private $stmtResult; //used to store get_result()
 	private $stmt;
 	private $defaultFetchType;
+	private $isRowsMatched;
 	private const ALLOWED_FETCH_TYPES_BOTH = [
 		'assoc', 'obj', 'num', 'col'
 	];
@@ -109,10 +110,14 @@ class SimpleMySQLi {
 	/**
 	 * Get affected rows. Can be used instead of numRows() in SELECT
 	 *
-	 * @return int $mysqli->affected_rows
+	 * @return int $mysqli->affected_rows or rows matched if setRowsMatched() is used
 	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
 	public function affectedRows() {
+		//Check if setRowsMatched() used. Returns empty string if not one of mysqli::info allowed queries. Only UPDATE has 'Rows Matched'
+		if($this->isRowsMatched && ($affectedRowsInfo = $this->affectedRowsInfo()) && isset($affectedRowsInfo['Rows matched'])) {
+			return $affectedRowsInfo['Rows matched'];
+		}
 		return $this->mysqli->affected_rows;
 	}
 
@@ -126,6 +131,17 @@ class SimpleMySQLi {
 	public function affectedRowsInfo() {
 		preg_match_all('/(\S[^:]+): (\d+)/', $this->mysqli->info, $matches);
 		return array_combine($matches[1], $matches[2]);
+	}
+	
+	/**
+	 * If UPDATE query, will use rows matched, instead of rows changed. Useful if updating row with same values
+	 *
+	 * @param bool $matched (optional) If true, causes affectedRows() to use rows matched, instead of rows changed. False is normal
+	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
+	 */
+	public function setRowsMatched(bool $matched = true) {
+		if($matched) $this->isRowsMatched = true;
+		else $this->isRowsMatched = false;
 	}
 
 	/**
@@ -254,6 +270,9 @@ class SimpleMySQLi {
 	}
 
 	/**
+	 * Just a normal transaction that will automatically rollback and print your message to your error log. 
+	 * Will also rollback if `affectedRows()` is less than 1.
+	 *
 	 * @param array|string $sql SQL query. Can be array for different queries or a string for the same query with different values
 	 * @param array $values Values or variables to bind to query
 	 * @param array $types (optional) Variable type for each bound value/variable
