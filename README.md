@@ -43,8 +43,8 @@ PHP 7.1+
     - [Fetch Scalar (Single Value)](#fetch-scalar-single-value)
     - [Fetch Single Column as Array](#fetch-single-column-as-array)
     - [Fetch Each Column as Separate Array Variable](#fetch-each-column-as-separate-array-variable)
-    - [Fetch Key-Pair](#fetch-key-pair)
-    - [Fetch Key, Array as Pair](#fetch-key-array-as-pair)
+    - [Fetch Key/Value Pair](#fetch-keyvalue-pair)
+    - [Fetch Key/Value Pair Array](#fetch-keyvalue-pair-array)
     - [Fetch in Groups](#fetch-in-groups)
     - [Fetch in Groups, One Column](#fetch-in-groups-one-column)
   - [Like](#like)
@@ -129,7 +129,7 @@ echo $delete->affectedRows();
 
 ### Update Same Values
 
-The problem with `affectedRows()` is that it will literally just tell you if any rows are affected. So if it returned 0, you wouldn't know if that means that the WHERE clause didn't match or that you updated the row with the same values. One solution Simple MySQLi offers is to use affectedRowsInfo(), which utilizes [mysqli::info](http://php.net/manual/en/mysqli.info.php) and converts the result string to an array. You can use this in other queries it supports as well.
+The problem with `affectedRows()` is that it will literally just tell you if any rows are affected. So if it returned 0, you wouldn't know if that means that the WHERE clause didn't match or that you updated the row with the same values. One solution Simple MySQLi offers is to use `affectedRowsInfo()`, which utilizes [mysqli::info](http://php.net/manual/en/mysqli.info.php) and converts the result string to an array. You can use this in other queries it supports as well.
 
 ```php
 $update = $mysqli->query("UPDATE myTable SET name = ? WHERE id = ?", [$_POST['name'], $_SESSION['id']]);
@@ -148,9 +148,9 @@ This is nice and all, but it might be more convenient in some cases to just chan
 ```php
 $update = $mysqli->query("UPDATE myTable SET name = ? WHERE id = ?", [$_POST['name'], $_SESSION['id']]);
 $mysqli->setRowsMatched(); //Use rows matched
-echo $update->affectedRows(); //0
-$mysqli->setRowsMatched(false); //Revert back to normal. Use rows changed
 echo $update->affectedRows(); //1
+$mysqli->setRowsMatched(false); //Revert back to normal. Use rows changed
+echo $update->affectedRows(); //0
 ```
 
 ## Select
@@ -275,7 +275,7 @@ Output:
 ['Bobby', 'Jessica', 'Victor', 'Andrew', 'Mallory']
 ```
 
-### Fetch Key-Pair
+### Fetch Key/Value Pair
 
 ```php
 //First column must be unique, like a primary key; can only select 2 columns
@@ -290,7 +290,7 @@ Output:
 [7 => 'Jerry', 10 => 'Bill', 29 => 'Bobby']
 ```
 
-### Fetch Key, Array as Pair
+### Fetch Key/Value Pair Array
 
 ```php
 //First column must be unique, like a primary key

@@ -114,9 +114,9 @@ class SimpleMySQLi {
 	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
 	public function affectedRows() {
-		//Check if setRowsMatched() used. Returns empty string if not one of mysqli::info allowed queries. Only UPDATE has 'Rows Matched'
-		if($this->isRowsMatched && ($affectedRowsInfo = $this->affectedRowsInfo()) && isset($affectedRowsInfo['Rows matched'])) {
-			return $affectedRowsInfo['Rows matched'];
+		//Check if setRowsMatched() used. Only UPDATE has 'Rows Matched'
+		if($this->isRowsMatched) {
+			return $this->affectedRowsInfo()['Rows matched'] ?? $this->mysqli->affected_rows;
 		}
 		return $this->mysqli->affected_rows;
 	}
