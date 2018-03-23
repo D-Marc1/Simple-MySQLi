@@ -286,7 +286,7 @@ class SimpleMySQLi {
 			$isArray = true;
 			$countValues = count($values);
 
-			if($types) $countTypes = count($types);
+			if($types) $countTypes = count($types); //if variable types specified
 
 			if(!is_array($sql)) {
 				$currSQL = $sql;
@@ -307,7 +307,7 @@ class SimpleMySQLi {
 
 				if($isArray) $currSQL = $sql[$x]; //Either different queries or the same one with different values
 				
-				if($isArray || (!$isArray && $x === 0)) { //Make it more efficient if same query used multiple times with different values
+				if($isArray || (!$isArray && $x === 0)) { //Prepared once if same query used multiple times with different values
 					$stmt = $this->mysqli->prepare($currSQL);
 				}
 				$stmt->bind_param($currTypes, ...$values[$x]);
@@ -315,12 +315,15 @@ class SimpleMySQLi {
 				if($this->affectedRows() < 1) { 
 					throw new SimpleMySQLiException("Query did not succeed, with affectedRows() of: {$this->affectedRows()} Query: $currSQL");
 				}
-				$stmt->close();
+				if($isArray || (!$isArray && $x === $countValues)) { //If prepared once, should only close on last values used
+					$stmt->close();
+				}
 			}
-			$this->mysqli->autocommit(TRUE);
 		} catch(Exception $e) {
 			$this->mysqli->rollback();
 			throw $e;
+		} finally {
+			$this->mysqli->autocommit(TRUE);
 		}
 	}
 	

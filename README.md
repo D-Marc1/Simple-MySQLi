@@ -19,6 +19,7 @@ On a side note, if you'd like to know how to use MySQLi the "vanilla way", check
 
 - No named parameters
 - If you need to use some of the more obscure MySQLi functions, then this is certainly not the right fit for you.
+- Only supports MySQL and MariaDB
 
 The purpose of this class is to keep things as simple as possible, while accounting for the most common uses. If there's something you'd like me to add, feel free to suggest it or send a pull request.
 
