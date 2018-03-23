@@ -1,5 +1,9 @@
 # Changelog
 
+- [**1.4.2**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.4.2) - March 23, 2018
+
+  - Fix `transaction()` on prepare once, execute multiple
+
 - [**1.4.1**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.4.1) - March 20, 2018
 
   - Add `setRowsMatched()` to use rows matched, instead of rows changed on UPDATE query
@@ -13,7 +17,7 @@
 
 - [**1.3.2**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.3.2) - January 25, 2018
 
-  - Add affectedRowsInfo and free fetch results
+  - Add `affectedRowsInfo()` and free fetch results
 
 - [**1.3.1**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.3.1) - January 24, 2018
 
