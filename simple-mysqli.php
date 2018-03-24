@@ -136,7 +136,7 @@ class SimpleMySQLi {
 	}
 	
 	/**
-	 * If UPDATE query, will use rows matched, instead of rows changed. Useful if updating row with same values
+	 * If UPDATE query, will use rows matched, instead of rows changed for affectedRows(). Useful if updating row with same values
 	 *
 	 * @param bool $matched (optional) If true, causes affectedRows() to use rows matched, instead of rows changed. False is normal
 	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)

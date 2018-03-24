@@ -621,7 +621,7 @@ function setRowsMatched(bool $matched = true)
 
 **Description**
 
-If UPDATE query, will use rows matched, instead of rows changed. Useful if updating row with same values
+If UPDATE query, will use rows matched, instead of rows changed for `affectedRows()`. Useful if updating row with same values
 
 **Parameters**
 
