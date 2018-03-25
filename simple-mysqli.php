@@ -317,15 +317,14 @@ class SimpleMySQLi {
 				if($this->affectedRows() < 1) { 
 					throw new SimpleMySQLiException("Query did not succeed, with affectedRows() of: {$this->affectedRows()} Query: $currSQL");
 				}
-				if($isArray || (!$isArray && $x === $countValues)) { //If prepared once, should only close on last values used
+				if($isArray || (!$isArray && $x === $countValues - 1)) { //If prepared once, should only close on last values used
 					$stmt->close();
 				}
 			}
+			$this->mysqli->autocommit(TRUE);
 		} catch(Exception $e) {
 			$this->mysqli->rollback();
 			throw $e;
-		} finally {
-			$this->mysqli->autocommit(TRUE);
 		}
 	}
 	
@@ -339,11 +338,10 @@ class SimpleMySQLi {
 		try {
 			$this->mysqli->autocommit(FALSE);	
 			$callback($this);
+			$this->mysqli->autocommit(TRUE);
 		} catch(Exception $e) {
 			$this->mysqli->rollback();
 			throw $e;
-		} finally {
-			$this->mysqli->autocommit(TRUE);
 		}
 	}
 	

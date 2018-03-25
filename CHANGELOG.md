@@ -1,5 +1,9 @@
 # Changelog
 
+- [**1.4.3**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.4.3) - March 25, 2018
+
+  - Fix off-by-one error to close stmt with `transaction()` on prepare once, execute multiple
+
 - [**1.4.2**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.4.2) - March 23, 2018
 
   - Fix `transaction()` on prepare once, execute multiple
@@ -12,7 +16,7 @@
 
   - Add `execute()`, `whereIn()`, `numRows()`, `transactionCallback()`, `freeResult()`, `closeStmt()`
   - Default charset is now 'utf8mb4' instead of 'utf8'
-  - Don't automatically free result anymore on fetchAll()
+  - Don't automatically free result anymore on `fetchAll()`
   - Add ability to fetch into class
 
 - [**1.3.2**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.3.2) - January 25, 2018
