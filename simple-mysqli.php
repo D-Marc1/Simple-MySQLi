@@ -5,7 +5,7 @@ class SimpleMySQLiException extends Exception {}
 /**
  * Class SimpleMySQLi
  *
- * @version 1.4.2
+ * @version 1.4.3
  */
 class SimpleMySQLi {
 	private $mysqli;
@@ -321,6 +321,7 @@ class SimpleMySQLi {
 					$stmt->close();
 				}
 			}
+			
 			$this->mysqli->autocommit(TRUE);
 		} catch(Exception $e) {
 			$this->mysqli->rollback();
