@@ -527,7 +527,7 @@ function execute(array $values = [], string $types = '')
 
 **Description**
 
-Used in order to be more efficient if same SQL is used with different values
+Used in order to be more efficient if same SQL is used with different values. Is really a re-execute function
 
 **Parameters**
 
@@ -545,7 +545,7 @@ Used in order to be more efficient if same SQL is used with different values
 ## whereIn()
 
 ```php
-function whereIn(array $inArr)
+function whereIn(array $inArr): string
 ```
 
 **Description**
@@ -558,7 +558,7 @@ Create correct number of questions marks for `WHERE IN()` array.
 
 **Returns**
 
-Correct number of question marks
+string **Correct number of question marks**
 
 **Throws**
 
@@ -568,7 +568,7 @@ Correct number of question marks
 ## numRows()
 
 ```php
-function numRows()
+function numRows(): int
 ```
 
 **Description**
@@ -577,7 +577,7 @@ Get number of rows from SELECT.
 
 **Returns**
 
-- **$mysqli->num_rows**
+- int **$mysqli->num_rows**
 
 **Throws**
 
@@ -587,7 +587,7 @@ Get number of rows from SELECT.
 ## affectedRows()
 
 ```php
-function affectedRows()
+function affectedRows(): int
 ```
 
 **Description**
@@ -596,8 +596,8 @@ Get affected rows. Can be used instead of numRows() in SELECT
 
 **Returns**
 
-- **$mysqli->affected_rows**
-- **Rows Matched** if `setRowsMatched()` is used
+- int **$mysqli->affected_rows**
+- int **Rows Matched** if `setRowsMatched()` is used
 
 **Throws**
 
@@ -606,7 +606,7 @@ Get affected rows. Can be used instead of numRows() in SELECT
 ## affectedRowsInfo()
 
 ```php
-function affectedRowsInfo()
+function affectedRowsInfo(): array
 ```
 
 **Description**
@@ -615,7 +615,7 @@ A more specific version of affectedRows() to give you more info what happened. U
 
 **Returns**
 
-- **Associative array converted from result string**
+- array **Associative array converted from result string**
 
 **Throws**
 
@@ -624,7 +624,7 @@ A more specific version of affectedRows() to give you more info what happened. U
 ## setRowsMatched()
 
 ```php
-function setRowsMatched(bool $matched = true)
+function setRowsMatched(bool $matched = true): void
 ```
 
 **Description**
@@ -642,7 +642,7 @@ If UPDATE query, will use rows matched, instead of rows changed for `affectedRow
 ## insertId()
 
 ```php
-function insertId()
+function insertId(): int
 ```
 
 **Description**
@@ -651,7 +651,7 @@ Get the latest primary key inserted
 
 **Returns**
 
-- **$mysqli->insert_id**
+- int **$mysqli->insert_id**
 
 **Throws**
 
@@ -688,7 +688,7 @@ Fetch one row at a time
 ## fetchAll()
 
 ```php
-function fetchAll(string $fetchType = '', string $className = '')
+function fetchAll(string $fetchType = '', string $className = ''): array
 ```
 
 **Description**
@@ -706,8 +706,8 @@ Fetch all results in array
 
 **Returns**
 
-- **Full array of `$fetchType` specified**
-- **[]** if no results
+- array **Full array of `$fetchType` specified**
+- array **[]** if no results
 
 **Throws**
 
@@ -719,7 +719,7 @@ Fetch all results in array
 ## transaction()
 
 ```php
-function transaction(array|string $sql, array $values, array $types = [])
+function transaction(array|string $sql, array $values, array $types = []): void
 ```
 
 **Description**
@@ -740,7 +740,7 @@ Just a normal transaction that will automatically rollback and print your messag
 ## transactionCallback()
 
 ```php
-function transactionCallback(callable $callback($this))
+function transactionCallback(callable $callback($this)): void
 ```
 
 **Description**
@@ -758,7 +758,7 @@ Do stuff inside of transaction
 ## freeResult()
 
 ```php
-function freeResult()
+function freeResult(): void
 ```
 
 **Description**
@@ -772,7 +772,7 @@ Frees MySQL result
 ## closeStmt()
 
 ```php
-function closeStmt()
+function closeStmt(): void
 ```
 
 **Description**
@@ -786,7 +786,7 @@ Closes MySQL prepared statement
 ## close()
 
 ```php
-function close()
+function close(): void
 ```
 
 **Description**

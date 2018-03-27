@@ -1,5 +1,10 @@
 # Changelog
 
+- [**1.4.4**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.4.4) - March 27, 2018
+
+	- Enforce return type declaration on methods when possible
+	- Switch to more consistent if style
+
 - [**1.4.3**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.4.3) - March 25, 2018
 
   - Fix off-by-one error to close stmt with `transaction()` on prepare once, execute multiple

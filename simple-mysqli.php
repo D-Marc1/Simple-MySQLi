@@ -5,7 +5,7 @@ class SimpleMySQLiException extends Exception {}
 /**
  * Class SimpleMySQLi
  *
- * @version 1.4.3
+ * @version 1.4.4
  */
 class SimpleMySQLi {
 	private $mysqli;
@@ -71,7 +71,7 @@ class SimpleMySQLi {
 	}
 	
 	/**
-	 * Used in order to be more efficient if same SQL is used with different values
+	 * Used in order to be more efficient if same SQL is used with different values. Is really a re-execute function
 	 *
 	 * @param array $values (optional) Values or variables to bind to query. Can be empty for selecting all rows
 	 * @param string $types (optional) Variable type for each bound value/variable
@@ -95,7 +95,7 @@ class SimpleMySQLi {
 	 * @return string Correct number of question marks
 	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
-	public function whereIn(array $inArr) {
+	public function whereIn(array $inArr): string {
 		return $clause = implode(',', array_fill(0, count($inArr), '?')); //create question marks
 	}
 	
@@ -105,7 +105,7 @@ class SimpleMySQLi {
 	 * @return int $mysqli->num_rows
 	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
-	public function numRows() {
+	public function numRows(): int {
 		return $this->stmtResult->num_rows;
 	}
 
@@ -115,7 +115,7 @@ class SimpleMySQLi {
 	 * @return int $mysqli->affected_rows or rows matched if setRowsMatched() is used
 	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
-	public function affectedRows() {
+	public function affectedRows(): int {
 		//Check if setRowsMatched() used. Only UPDATE has 'Rows Matched'
 		if($this->isRowsMatched) {
 			return $this->affectedRowsInfo()['Rows matched'] ?? $this->mysqli->affected_rows;
@@ -130,7 +130,7 @@ class SimpleMySQLi {
 	 * @return array Associative array converted from result string
 	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
-	public function affectedRowsInfo() {
+	public function affectedRowsInfo(): array {
 		preg_match_all('/(\S[^:]+): (\d+)/', $this->mysqli->info, $matches);
 		return array_combine($matches[1], $matches[2]);
 	}
@@ -141,7 +141,7 @@ class SimpleMySQLi {
 	 * @param bool $matched (optional) If true, causes affectedRows() to use rows matched, instead of rows changed. False is normal
 	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
-	public function setRowsMatched(bool $matched = true) {
+	public function setRowsMatched(bool $matched = true): void {
 		if($matched) $this->isRowsMatched = true;
 		else $this->isRowsMatched = false;
 	}
@@ -152,7 +152,7 @@ class SimpleMySQLi {
 	 * @return int $mysqli->insert_id
 	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
-	public function insertId() {
+	public function insertId(): int {
 		return $this->mysqli->insert_id;
 	}
 
@@ -181,11 +181,15 @@ class SimpleMySQLi {
 			throw new SimpleMySQLiException("You can only specify a class name with 'obj' as the fetch type");
 		}
 
-		if($fetchType === 'num') $row = $stmtResult->fetch_row();
-		else if($fetchType === 'assoc') $row = $stmtResult->fetch_assoc();
-		else if($fetchType === 'obj' && !$className) $row = $stmtResult->fetch_object();
-		else if($fetchType === 'obj' && $className) $row = $stmtResult->fetch_object($className);
-		else if($fetchType === 'col') {
+		if($fetchType === 'num') {
+			$row = $stmtResult->fetch_row();
+		} else if($fetchType === 'assoc') {
+			$row = $stmtResult->fetch_assoc();
+		} else if($fetchType === 'obj' && !$className) {
+			$row = $stmtResult->fetch_object();
+		} else if($fetchType === 'obj' && $className) {
+			$row = $stmtResult->fetch_object($className);
+		} else if($fetchType === 'col') {
 			if($stmtResult->field_count !== 1) {
 				throw new SimpleMySQLiException("The fetch type: '$fetchType' must have exactly 1 column in query");
 			}
@@ -209,7 +213,7 @@ class SimpleMySQLi {
 	*                               If fetch mode specification is violated
 	* @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	*/
-	public function fetchAll(string $fetchType = '', string $className = '') {
+	public function fetchAll(string $fetchType = '', string $className = ''): array {
 		$stmtResult = $this->stmtResult;
 		$arr = [];
 
@@ -227,39 +231,40 @@ class SimpleMySQLi {
 		}
 
 		//All of the fetch types
-		if($fetchType === 'num') $arr = $stmtResult->fetch_all(MYSQLI_NUM);
-		else if($fetchType === 'assoc') $arr = $stmtResult->fetch_all(MYSQLI_ASSOC);
-		else if($fetchType === 'obj') {
+		if($fetchType === 'num') {
+			$arr = $stmtResult->fetch_all(MYSQLI_NUM);
+		} else if($fetchType === 'assoc') {
+			$arr = $stmtResult->fetch_all(MYSQLI_ASSOC);
+		} else if($fetchType === 'obj') {
 			if(!$className) {
 				while($row = $stmtResult->fetch_object()) {
 					$arr[] = $row;
 				}
-			}
-			else {
+			} else {
 				while($row = $stmtResult->fetch_object($className)) {
 					$arr[] = $row;
 				}
 			}
-		}
-		else if($fetchType === 'col') {
+		} else if($fetchType === 'col') {
 			if($stmtResult->field_count !== 1) {
 				throw new SimpleMySQLiException("The fetch type: '$fetchType' must have exactly 1 column in query");
 			}
+			
 			while($row = $stmtResult->fetch_row()) {
 				$arr[] = $row[0];
 			}
-		}
-		else if($fetchType === 'keyPair' || $fetchType === 'groupCol') {
+		} else if($fetchType === 'keyPair' || $fetchType === 'groupCol') {
 			if($stmtResult->field_count !== 2) {
 				throw new SimpleMySQLiException("The fetch type: '$fetchType' must have exactly two columns in query");
 			}
+			
 			while($row = $stmtResult->fetch_row()) {
 				if($fetchType === 'keyPair') $arr[$row[0]] = $row[1];
 				else if($fetchType === 'groupCol') $arr[$row[0]][] = $row[1];
 			}
-		}
-		else if($fetchType === 'keyPairArr' || $fetchType === 'group') {
+		} else if($fetchType === 'keyPairArr' || $fetchType === 'group') {
 			$firstColName = $stmtResult->fetch_field_direct(0)->name;
+			
 			while($row = $stmtResult->fetch_assoc()) {
 				$firstColVal = $row[$firstColName];
 				unset($row[$firstColName]);
@@ -281,7 +286,7 @@ class SimpleMySQLi {
 	 * @throws SimpleMySQLiException If there is a mismatch in parameter values, parameter types or SQL
 	 * @throws mysqli_sql_exception If transaction failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
-	public function transaction($sql, array $values, array $types = []) {
+	public function transaction($sql, array $values, array $types = []): void {
 		try {
 			$this->mysqli->autocommit(FALSE);
 
@@ -293,13 +298,13 @@ class SimpleMySQLi {
 			if(!is_array($sql)) {
 				$currSQL = $sql;
 				$isArray = false;
+			} else { //Only count sql if array
+				$countSql = count($sql);
 			}
-			else $countSql = count($sql); //Only count sql if array
 
-			if($isArray && $countValues !== $countSql) { //If SQL array and type amounts don't match
+			if($isArray && $countValues !== $countSql) { //If SQL array and value amounts don't match
 				throw new SimpleMySQLiException("The paramters 'sql' and 'values' must correlate if 'sql' is an array. You entered 'sql' array count: $countSql and 'types' array count: $countValues");
-			}
-			else if($types && $countValues !== $countTypes) {
+			} else if($types && $countValues !== $countTypes) { //If variable types used and values don't match
 				throw new SimpleMySQLiException("The paramters 'values' and 'types' must correlate. You entered 'values' array count: $countValues and 'types' array count: $countTypes");
 			}
 
@@ -312,11 +317,13 @@ class SimpleMySQLi {
 				if($isArray || (!$isArray && $x === 0)) { //Prepared once if same query used multiple times with different values
 					$stmt = $this->mysqli->prepare($currSQL);
 				}
+				
 				$stmt->bind_param($currTypes, ...$values[$x]);
 				$stmt->execute();
 				if($this->affectedRows() < 1) { 
 					throw new SimpleMySQLiException("Query did not succeed, with affectedRows() of: {$this->affectedRows()} Query: $currSQL");
 				}
+				
 				if($isArray || (!$isArray && $x === $countValues - 1)) { //If prepared once, should only close on last values used
 					$stmt->close();
 				}
@@ -335,7 +342,7 @@ class SimpleMySQLi {
 	 * @param callable $callback Closure to do transaction operations inside. Parameter value is $this
 	 * @throws mysqli_sql_exception If transaction failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
-	public function transactionCallback(callable $callback) {
+	public function transactionCallback(callable $callback): void {
 		try {
 			$this->mysqli->autocommit(FALSE);	
 			$callback($this);
@@ -351,7 +358,7 @@ class SimpleMySQLi {
 	 *
 	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
-	public function freeResult() {
+	public function freeResult(): void {
 		$this->stmtResult->free();
 	}
 	
@@ -360,7 +367,7 @@ class SimpleMySQLi {
 	 *
 	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
-	public function closeStmt() {
+	public function closeStmt(): void {
 		$this->stmt->close();
 	}
 	
@@ -369,7 +376,7 @@ class SimpleMySQLi {
 	 *
 	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
-	public function close() {
+	public function close(): void {
 		$this->mysqli->close();
 	}
 }
