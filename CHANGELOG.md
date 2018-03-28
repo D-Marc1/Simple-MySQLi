@@ -1,5 +1,9 @@
 # Changelog
 
+- [**1.4.5**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.4.5) - March 28, 2018
+
+	- Remove `setRowsMatched()`, in favor of the new getter method `rowsMatched()`
+
 - [**1.4.4**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.4.4) - March 27, 2018
 
 	- Enforce return type declaration on methods when possible

@@ -5,14 +5,13 @@ class SimpleMySQLiException extends Exception {}
 /**
  * Class SimpleMySQLi
  *
- * @version 1.4.4
+ * @version 1.4.5
  */
 class SimpleMySQLi {
 	private $mysqli;
 	private $stmtResult; //used to store get_result()
 	private $stmt;
 	private $defaultFetchType;
-	private $isRowsMatched;
 	private const ALLOWED_FETCH_TYPES_BOTH = [
 		'assoc', 'obj', 'num', 'col'
 	];
@@ -116,10 +115,6 @@ class SimpleMySQLi {
 	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
 	public function affectedRows(): int {
-		//Check if setRowsMatched() used. Only UPDATE has 'Rows Matched'
-		if($this->isRowsMatched) {
-			return $this->affectedRowsInfo()['Rows matched'] ?? $this->mysqli->affected_rows;
-		}
 		return $this->mysqli->affected_rows;
 	}
 
@@ -136,14 +131,13 @@ class SimpleMySQLi {
 	}
 	
 	/**
-	 * If UPDATE query, will use rows matched, instead of rows changed for affectedRows(). Useful if updating row with same values
+	 * Get rows matched instead of rows changed. Can strictly be used on UPDATE. Otherwise returns false
 	 *
-	 * @param bool $matched (optional) If true, causes affectedRows() to use rows matched, instead of rows changed. False is normal
+	 * @return int Rows matched
 	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
-	public function setRowsMatched(bool $matched = true): void {
-		if($matched) $this->isRowsMatched = true;
-		else $this->isRowsMatched = false;
+	public function rowsMatched(): int {
+		return $this->affectedRowsInfo()['Rows matched'] ?? false;
 	}
 
 	/**

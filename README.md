@@ -62,7 +62,7 @@ PHP 7.1+
   - [numRows()](#numrows)
   - [affectedRows()](#affectedrows)
   - [affectedRowsInfo()](#affectedrowsinfo)
-  - [setRowsMatched()](#setrowsmatched)
+  - [rowsMatched()](#rowsmatched)
   - [insertId()](#insertid)
   - [fetch()](#fetch)
   - [fetchAll()](#fetchall)
@@ -148,10 +148,8 @@ This is nice and all, but it might be more convenient in some cases to just chan
 
 ```php
 $update = $mysqli->query("UPDATE myTable SET name = ? WHERE id = ?", [$_POST['name'], $_SESSION['id']]);
-$mysqli->setRowsMatched(); //Use rows matched
-echo $update->affectedRows(); //1
-$mysqli->setRowsMatched(false); //Revert back to normal. Use rows changed
-echo $update->affectedRows(); //0
+echo $update->rowsMatched(); //Rows Matched: 1
+echo $update->affectedRows(); //Rows Changed: 0
 ```
 
 ## Select
@@ -597,7 +595,6 @@ Get affected rows. Can be used instead of numRows() in SELECT
 **Returns**
 
 - int **$mysqli->affected_rows**
-- int **Rows Matched** if `setRowsMatched()` is used
 
 **Throws**
 
@@ -621,19 +618,19 @@ A more specific version of affectedRows() to give you more info what happened. U
 
 - **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
 
-## setRowsMatched()
+## rowsMatched()
 
 ```php
-function setRowsMatched(bool $matched = true): void
+function rowsMatched(): int
 ```
 
 **Description**
 
-If UPDATE query, will use rows matched, instead of rows changed for `affectedRows()`. Useful if updating row with same values
+Get rows matched instead of rows changed. Can strictly be used on UPDATE. Otherwise returns false
 
-**Parameters**
+**Returns**
 
-- **$matched** (optional) -  If true, causes `affectedRows()` to use rows matched, instead of rows changed. False is normal
+- int **Rows matched**
 
 **Throws**
 
