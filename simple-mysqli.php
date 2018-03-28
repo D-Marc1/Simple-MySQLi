@@ -95,7 +95,7 @@ class SimpleMySQLi {
 	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
 	public function whereIn(array $inArr): string {
-		return $clause = implode(',', array_fill(0, count($inArr), '?')); //create question marks
+		return implode(',', array_fill(0, count($inArr), '?')); //create question marks
 	}
 	
 	/**
