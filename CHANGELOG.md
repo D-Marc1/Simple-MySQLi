@@ -1,5 +1,9 @@
 # Changelog
 
+- [**1.4.6**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.4.6) - March 29, 2018
+
+  - Add composer and return type for `$this`.
+
 - [**1.4.5**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.4.5) - March 28, 2018
 
 	- Remove `setRowsMatched()`, in favor of the new getter method `rowsMatched()`

@@ -27,6 +27,28 @@ The purpose of this class is to keep things as simple as possible, while account
 
 PHP 7.1+
 
+# Install
+
+## Composer
+
+```
+composer require websitebeaver/simple-mysqli
+```
+
+## Git
+
+Clone either the latest version or by tag.
+
+```
+git clone https://github.com/WebsiteBeaver/Simple-MySQLi.git
+```
+
+Then include or require the file in your php page.
+
+```php
+require simple-mysqli.php
+```
+
 # Table of Contents
 
 - [Examples](#examples)

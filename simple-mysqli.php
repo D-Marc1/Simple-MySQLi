@@ -5,7 +5,7 @@ class SimpleMySQLiException extends Exception {}
 /**
  * Class SimpleMySQLi
  *
- * @version 1.4.5
+ * @version 1.4.6
  */
 class SimpleMySQLi {
 	private $mysqli;
