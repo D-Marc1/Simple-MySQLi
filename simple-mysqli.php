@@ -58,7 +58,7 @@ class SimpleMySQLi {
 	 * @return $this
 	 * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
-	public function query(string $sql, array $values = [], string $types = '') {		
+	public function query(string $sql, array $values = [], string $types = ''): self {		
 		if(!$types) $types = str_repeat('s', count($values)); //String type for all variables if not specified
 
 		$stmt = $this->stmt = $this->mysqli->prepare($sql);
@@ -77,7 +77,7 @@ class SimpleMySQLi {
 	 * @return $this
 	 * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
-	public function execute(array $values = [], string $types = '') {		
+	public function execute(array $values = [], string $types = ''): self {		
 		if(!$types) $types = str_repeat('s', count($values)); //String type for all variables if not specified
 		
 		$stmt = $this->stmt;

@@ -496,7 +496,7 @@ new SimpleMySQLi(string $host, string $username, string $password, string $dbNam
 ## query()
 
 ```php
-function query(string $sql, array $values = [], string $types = '')
+function query(string $sql, array $values = [], string $types = ''): self
 ```
 
 **Description**
@@ -520,7 +520,7 @@ All queries go here. If select statement, needs to be used with either `fetch()`
 ## execute()
 
 ```php
-function execute(array $values = [], string $types = '')
+function execute(array $values = [], string $types = ''): self
 ```
 
 **Description**
