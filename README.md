@@ -100,7 +100,7 @@ require simple-mysqli.php
   - [insertId()](#insertid)
   - [fetch()](#fetch)
   - [fetchAll()](#fetchall)
-  - [multiQuery()](#multiQuery)
+  - [multiQuery()](#multiquery)
   - [transaction()](#transaction)
   - [freeResult()](#freeresult)
   - [closeStmt()](#closestmt)
