@@ -5,7 +5,7 @@ class SimpleMySQLiException extends Exception {}
 /**
  * Class SimpleMySQLi
  *
- * @version 1.4.6
+ * @version 1.5.0
  */
 class SimpleMySQLi {
 	private $mysqli;
@@ -280,7 +280,7 @@ class SimpleMySQLi {
 	 * @throws SimpleMySQLiException If there is a mismatch in parameter values, parameter types or SQL
 	 * @throws mysqli_sql_exception If transaction failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
-	public function transaction($sql, array $values, array $types = []): void {
+	public function multiQuery($sql, array $values, array $types = []): void {
 		try {
 			$this->mysqli->autocommit(FALSE);
 
@@ -336,7 +336,7 @@ class SimpleMySQLi {
 	 * @param callable $callback Closure to do transaction operations inside. Parameter value is $this
 	 * @throws mysqli_sql_exception If transaction failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
-	public function transactionCallback(callable $callback): void {
+	public function transaction(callable $callback): void {
 		try {
 			$this->mysqli->autocommit(FALSE);	
 			$callback($this);

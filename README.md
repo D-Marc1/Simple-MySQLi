@@ -29,17 +29,29 @@ PHP 7.1+
 
 # Install
 
-## Composer
+[Click here](https://github.com/WebsiteBeaver/Simple-MySQLi/blob/master/CHANGELOG.md) to view changes to each version.
+
+**Composer**
 
 ```
 composer require websitebeaver/simple-mysqli
 ```
 
-## Git
+Then include or require the file in your php page.
 
-Clone either the latest version or by tag.
+```php
+require 'vendor/autoload.php';
+```
+
+**Git**
+
+Clone either the latest version or by tag. 
 
 ```
+//Get by version number
+git clone https://github.com/WebsiteBeaver/Simple-MySQLi/tree/{your version number}
+
+//Get the latest
 git clone https://github.com/WebsiteBeaver/Simple-MySQLi.git
 ```
 
@@ -88,8 +100,8 @@ require simple-mysqli.php
   - [insertId()](#insertid)
   - [fetch()](#fetch)
   - [fetchAll()](#fetchall)
+  - [multiQuery()](#multiQuery)
   - [transaction()](#transaction)
-  - [transactionCallback()](#transactioncallback)
   - [freeResult()](#freeresult)
   - [closeStmt()](#closestmt)
   - [close()](#close)
@@ -424,7 +436,7 @@ $sql[] = "INSERT INTO myTable (name, age) VALUES (?, ?)";
 $sql[] = "UPDATE myTable SET name = ? WHERE id = ?";
 $sql[] = "UPDATE myTable SET name = ? WHERE id = ?";
 $arrOfValues = [[$_POST['name'], $_POST['age']], ['Pablo', 34], [$_POST['name'], $_SESSION['id']]];
-$mysqli->transaction($sql, $arrOfValues);
+$mysqli->multiQuery($sql, $arrOfValues);
 ```
 
 ### Same Template, Different Values
@@ -432,17 +444,17 @@ $mysqli->transaction($sql, $arrOfValues);
 ```php
 $sql = "INSERT INTO myTable (name, age) VALUES (?, ?)";
 $arrOfValues = [[$_POST['name'], $_POST['age']], ['Pablo', 34], [$_POST['name'], 22]];
-$mysqli->transaction($sql, $arrOfValues);
+$mysqli->multiQuery($sql, $arrOfValues);
 ```
 
 ### Transactions with Callbacks
 
-The regular way of doing transactions in Simple MySQLi is exceedingly concise and can be used in most cases. However, sometimes you might want a little more control. For instance, under the hood, it only checks if each query's `affectedRows()` is greater than one. This isn't suitable for a query like INSERT multiple or DELETE/UPDATE query that affects multiple rows. 
+The regular way of doing transactions in Simple MySQLi with `multiQuery()` is exceedingly concise and can be used in most cases. However, sometimes you might want a little more control. For instance, under the hood, it only checks if each query's `affectedRows()` is greater than one. This isn't suitable for a query like INSERT multiple or DELETE/UPDATE query that affects multiple rows. 
 
 There's also no need to start the transaction, nor deal with rollbacks. If you want to rollback, simply throw an exception, and it'll rollback for you, while printing the exception solely in the error log. Execute allows you to efficiently reuse your prepared statement with different values.
 
 ```php
-$mysqli->transactionCallback(function($mysqli) {
+$mysqli->transaction(function($mysqli) {
   $insert = $mysqli->query("INSERT INTO myTable (sender, receiver) VALUES (?, ?)", [28, 330]);
   if($insert->affectedRows() < 1) throw new Exception('Error inserting');
   echo $insert->insertId();
@@ -735,10 +747,10 @@ Fetch all results in array
   - If fetch mode specification is violated
 - **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
 
-## transaction()
+## multiQuery()
 
 ```php
-function transaction(array|string $sql, array $values, array $types = []): void
+function multiQuery(array|string $sql, array $values, array $types = []): void
 ```
 
 **Description**
@@ -756,10 +768,10 @@ Just a normal transaction that will automatically rollback and print your messag
 - **SimpleMySQLiException** If there is a mismatch in parameter values, parameter types or SQL
 - **mysqli_sql_exception** If transaction failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
 
-## transactionCallback()
+## transaction()
 
 ```php
-function transactionCallback(callable $callback($this)): void
+function transaction(callable $callback($this)): void
 ```
 
 **Description**

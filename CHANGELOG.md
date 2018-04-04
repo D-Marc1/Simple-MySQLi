@@ -1,8 +1,12 @@
 # Changelog
 
+- [**1.5.0**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.5.0) - April 3, 2018
+
+  - `transaction()` is now `multi_query()` and `transactionCallback()` is now `transaction()`
+
 - [**1.4.6**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.4.6) - March 29, 2018
 
-  - Add composer and return type for `$this`.
+  - Add composer and return type for `$this`
 
 - [**1.4.5**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.4.5) - March 28, 2018
 
