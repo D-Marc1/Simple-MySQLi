@@ -58,7 +58,7 @@ git clone https://github.com/WebsiteBeaver/Simple-MySQLi.git
 Then include or require the file in your php page.
 
 ```php
-require simple-mysqli.php
+require 'simple-mysqli.php';
 ```
 
 # Table of Contents
