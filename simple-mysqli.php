@@ -201,6 +201,7 @@ class SimpleMySQLi {
 	*               'keyPairArr' - Unique key (1st column) to array. Same as PDO::FETCH_UNIQUE
 	*               'group' - Group by common values in the 1st column into associative subarrays. Same as PDO::FETCH_GROUP
 	*               'groupCol' - Group by common values in the 1st column into 1D subarray. Same as PDO::FETCH_GROUP | PDO::FETCH_COLUMN
+	*               'groupObj' - Group by common values in the first column into object subarrays. Same as PDO::FETCH_GROUP | PDO::FETCH_CLASS
 	* @param string $className (optional) Class name to fetch into if 'obj' $fetchType
 	* @return array Full array of $fetchType specified; [] if no rows
 	* @throws SimpleMySQLiException If $fetchType specified isn't one of the allowed fetch modes in $defaultFetchType
