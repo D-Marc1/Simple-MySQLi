@@ -796,8 +796,8 @@ Just a normal transaction that will automatically rollback and print your messag
 **Parameters**
 
 - **array|string $sql** - SQL query; can be array for different queries or a string for the same query with different values
-- **array $values** - values or variables to bind to query
-- **string $types = ''** (optional) - variable type for each bound value/variable
+- **array $values** - Values or variables to bind to query
+- **array $types = []** (optional) - Array of variable type for each bound value/variable
 
 **Throws**
 

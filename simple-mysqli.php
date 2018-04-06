@@ -283,7 +283,7 @@ class SimpleMySQLi {
 	 *
 	 * @param array|string $sql SQL query. Can be array for different queries or a string for the same query with different values
 	 * @param array $values Values or variables to bind to query
-	 * @param array $types (optional) Variable type for each bound value/variable
+	 * @param array $types (optional) Array of variable type for each bound value/variable
 	 * @throws SimpleMySQLiException If there is a mismatch in parameter values, parameter types or SQL
 	 * @throws mysqli_sql_exception If transaction failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
