@@ -5,7 +5,7 @@ class SimpleMySQLiException extends Exception {}
 /**
  * Class SimpleMySQLi
  *
- * @version 1.5.0
+ * @version 1.5.1
  */
 class SimpleMySQLi {
 	private $mysqli;
@@ -16,7 +16,7 @@ class SimpleMySQLi {
 		'assoc', 'obj', 'num', 'col'
 	];
 	private const ALLOWED_FETCH_TYPES_FETCH_ALL = [
-		'keyPair', 'keyPairArr', 'group', 'groupCol'
+		'keyPair', 'keyPairArr', 'group', 'groupCol', 'groupObj'
 	];
 
 	/**
@@ -220,7 +220,7 @@ class SimpleMySQLi {
 			throw new SimpleMySQLiException("The variable 'fetchType' must be '$allowedComma'. You entered '$fetchType'");
 		}
 		
-		if($fetchType !== 'obj' && $className) {
+		if($fetchType !== 'obj' && $fetchType !== 'groupObj' && $className) {
 			throw new SimpleMySQLiException("You can only specify a class name with 'obj' as the fetch type");
 		}
 
@@ -230,14 +230,10 @@ class SimpleMySQLi {
 		} else if($fetchType === 'assoc') {
 			$arr = $stmtResult->fetch_all(MYSQLI_ASSOC);
 		} else if($fetchType === 'obj') {
-			if(!$className) {
-				while($row = $stmtResult->fetch_object()) {
-					$arr[] = $row;
-				}
-			} else {
-				while($row = $stmtResult->fetch_object($className)) {
-					$arr[] = $row;
-				}
+			if(!$className) $className = 'stdClass';
+			
+			while($row = $stmtResult->fetch_object($className)) {
+				$arr[] = $row;
 			}
 		} else if($fetchType === 'col') {
 			if($stmtResult->field_count !== 1) {
@@ -256,14 +252,24 @@ class SimpleMySQLi {
 				if($fetchType === 'keyPair') $arr[$row[0]] = $row[1];
 				else if($fetchType === 'groupCol') $arr[$row[0]][] = $row[1];
 			}
-		} else if($fetchType === 'keyPairArr' || $fetchType === 'group') {
+		} else if($fetchType === 'keyPairArr' || $fetchType === 'group' || $fetchType === 'groupObj') {
 			$firstColName = $stmtResult->fetch_field_direct(0)->name;
 			
-			while($row = $stmtResult->fetch_assoc()) {
-				$firstColVal = $row[$firstColName];
-				unset($row[$firstColName]);
-				if($fetchType === 'keyPairArr') $arr[$firstColVal] = $row;
-				else if($fetchType === 'group') $arr[$firstColVal][] = $row;
+			if(!$className) $className = 'stdClass';
+			
+			if($fetchType === 'groupObj') {
+				while($row = $stmtResult->fetch_object($className)) {
+					$firstColVal = $row->$firstColName;
+					unset($row->$firstColName);
+					$arr[$firstColVal][] = $row;
+				}
+			} else {
+				while($row = $stmtResult->fetch_assoc()) {
+					$firstColVal = $row[$firstColName];
+					unset($row[$firstColName]);
+					if($fetchType === 'keyPairArr') $arr[$firstColVal] = $row;
+					else if($fetchType === 'group') $arr[$firstColVal][] = $row;
+				}
 			}
 		}
 

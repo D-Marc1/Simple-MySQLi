@@ -9,8 +9,8 @@ On a side note, if you'd like to know how to use MySQLi the "vanilla way", check
 # Why Should I Use Simple MySQLi?
 
 - Concise Code
-- Awesome fetch modes
-- SQL queries are the same
+- [Awesome fetch modes](#select)
+- SQL queries are the vanilla
 - Accounts for most common uses
 - Variable type is optional
 - Bind variables and values (not sure how useful this is though)
@@ -82,6 +82,7 @@ require 'simple-mysqli.php';
     - [Fetch Key/Value Pair Array](#fetch-keyvalue-pair-array)
     - [Fetch in Groups](#fetch-in-groups)
     - [Fetch in Groups, One Column](#fetch-in-groups-one-column)
+    - [Fetch in Groups, Object Array](#fetch-in-groups-object-array)
   - [Like](#like)
   - [Where In Array](#where-in-array)
     - [With Other Placeholders](#with-other-placeholders)
@@ -396,6 +397,39 @@ Output:
   'brown' => ['Jordan', 'Eric']
 ]
 ```
+
+### Fetch in Groups, Object Array
+
+```php
+//First column must be common value to group by
+$arr = $mysqli->query("SELECT eye_color, name, weight FROM myTable WHERE age < ?", [29])->fetchAll("groupObj");
+if(!$arr) exit('No rows');
+var_export($arr);
+```
+
+You can even pass in a class name, like you would with 'obj'.
+
+```php
+$mysqli->query("SELECT eye_color, name, weight FROM myTable WHERE age < ?", [29])->fetchAll("groupObj", "myClass");
+```
+
+Output:
+
+```php
+[
+  'green' => [
+    stdClass Object ['name' => 'Patrick', 'weight' => 178],
+    stdClass Object ['name' => 'Olivia', 'weight' => 132]
+  ],
+  'blue' => [
+    stdClass Object ['name' => 'Kyle', 'weight' => 128],
+    stdClass Object ['name' => 'Ricky', 'weight' => 143]
+  ],
+  'brown' => [
+    stdClass Object ['name' => 'Jordan', 'weight' => 173],
+    stdClass Object ['name' => 'Eric', 'weight' => 198]
+  ]
+]
 
 ## Like
 
@@ -733,6 +767,7 @@ Fetch all results in array
   - **'keyPairArr'** - Unique key (1st column) to array. Same as `PDO::FETCH_UNIQUE`
   - **'group'** - Group by common values in the 1st column into associative subarrays. Same as `PDO::FETCH_GROUP`
   - **'groupCol'** - Group by common values in the 1st column into 1D subarray. Same as `PDO::FETCH_GROUP | PDO::FETCH_COLUMN`
+	- **'groupObj'** - Group by common values in the first column into object subarrays. Same as `PDO::FETCH_GROUP | PDO::FETCH_CLASS`
 - **string $className = ''** (optional) - Class name to fetch into if `obj` $fetchType
 
 **Returns**

@@ -1,5 +1,9 @@
 # Changelog
 
+- [**1.5.1**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.5.1) - April 6, 2018
+
+  - Add `fetchAll()` fetch mode 'groupObj'
+
 - [**1.5.0**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.5.0) - April 3, 2018
 
   - `transaction()` is now `multi_query()` and `transactionCallback()` is now `transaction()`
