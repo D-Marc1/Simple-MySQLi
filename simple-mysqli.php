@@ -5,7 +5,7 @@ class SimpleMySQLiException extends Exception {}
 /**
  * Class SimpleMySQLi
  *
- * @version 1.5.1
+ * @version 1.5.2
  */
 class SimpleMySQLi {
 	private $mysqli;
@@ -125,7 +125,7 @@ class SimpleMySQLi {
 	 * @return array Associative array converted from result string
 	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
-	public function affectedRowsInfo(): array {
+	public function info(): array {
 		preg_match_all('/(\S[^:]+): (\d+)/', $this->mysqli->info, $matches);
 		return array_combine($matches[1], $matches[2]);
 	}
@@ -137,7 +137,7 @@ class SimpleMySQLi {
 	 * @throws mysqli_sql_exception If mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
 	public function rowsMatched(): int {
-		return $this->affectedRowsInfo()['Rows matched'] ?? false;
+		return $this->info()['Rows matched'] ?? false;
 	}
 
 	/**

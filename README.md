@@ -96,7 +96,7 @@ require 'simple-mysqli.php';
   - [whereIn()](#wherein)
   - [numRows()](#numrows)
   - [affectedRows()](#affectedrows)
-  - [affectedRowsInfo()](#affectedrowsinfo)
+  - [info()](#info)
   - [rowsMatched()](#rowsmatched)
   - [insertId()](#insertid)
   - [fetch()](#fetch)
@@ -165,15 +165,15 @@ echo $delete->affectedRows();
 
 ### Update Same Values
 
-The problem with `affectedRows()` is that it will literally just tell you if any rows are affected. So if it returned 0, you wouldn't know if that means that the WHERE clause didn't match or that you updated the row with the same values. One solution Simple MySQLi offers is to use `affectedRowsInfo()`, which utilizes [mysqli::info](http://php.net/manual/en/mysqli.info.php) and converts the result string to an array. You can use this in other queries it supports as well.
+The problem with `affectedRows()` is that it will literally just tell you if any rows are affected. So if it returned 0, you wouldn't know if that means that the WHERE clause didn't match or that you updated the row with the same values. One solution Simple MySQLi offers is to use `info()`, which utilizes [mysqli::info](http://php.net/manual/en/mysqli.info.php) and converts the result string to an array. You can use this in other queries it supports as well.
 
 ```php
 $update = $mysqli->query("UPDATE myTable SET name = ? WHERE id = ?", [$_POST['name'], $_SESSION['id']]);
 echo $update->affectedRows();
-var_export($update->affectedRowsInfo()); //For more specific version
+var_export($update->info()); //For more specific version
 ```
 
-Here's what `affectedRowsInfo()` would print. This could be useful for checking if you updated your values with the exact same as the old ones.
+Here's what `info()` would print. This could be useful for checking if you updated your values with the exact same as the old ones.
 
 ```php
 ['Rows matched' => 1, 'Changed' => 0, 'Warnings' => 0]
@@ -669,10 +669,10 @@ Get affected rows. Can be used instead of numRows() in SELECT
 
 - **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
 
-## affectedRowsInfo()
+## info()
 
 ```php
-function affectedRowsInfo(): array
+function info(): array
 ```
 
 **Description**
