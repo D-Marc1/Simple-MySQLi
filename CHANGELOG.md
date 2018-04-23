@@ -2,6 +2,11 @@
 
 - [**1.5.2**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.5.2) - April 7, 2018
 
+  - Add support for entering constructor parameters for fetching objects in a class
+  - `multiQuery()` is now `atomicQuery()` to avoid confusion over a multiple statements
+
+- [**1.5.2**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.5.2) - April 7, 2018
+
   - `affectedRowsInfo()` is now `info()`
 
 - [**1.5.1**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.5.1) - April 6, 2018

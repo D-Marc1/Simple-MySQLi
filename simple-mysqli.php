@@ -5,7 +5,7 @@ class SimpleMySQLiException extends Exception {}
 /**
  * Class SimpleMySQLi
  *
- * @version 1.5.2
+ * @version 1.5.3
  */
 class SimpleMySQLi {
 	private $mysqli;
@@ -38,7 +38,7 @@ class SimpleMySQLi {
 	public function __construct(string $host, string $username, string $password, string $dbName, string $charset = 'utf8mb4', string $defaultFetchType = 'assoc') {
 		$this->defaultFetchType = $defaultFetchType;
 
-		if(!in_array($defaultFetchType, self::ALLOWED_FETCH_TYPES_BOTH)) { //check if it is an allowed fetch type
+		if(!in_array($defaultFetchType, self::ALLOWED_FETCH_TYPES_BOTH, true)) { //check if it is an allowed fetch type
 			$allowedComma = implode("','", self::ALLOWED_FETCH_TYPES_BOTH);
 			throw new SimpleMySQLiException("The variable 'defaultFetchType' must be '$allowedComma'. You entered '$defaultFetchType'");
 		}
@@ -155,18 +155,19 @@ class SimpleMySQLi {
 	*
 	* @param string $fetchType (optional) This overrides the default fetch type set in the constructor
 	* @param string $className (optional) Class name to fetch into if 'obj' $fetchType
+  * @param array $classParams (optional) Array of constructor parameters for class if 'obj' $fetchType
 	* @return mixed Array of either fetch type specified or default fetch mode. Can be a scalar too. Null if no more rows
 	* @throws SimpleMySQLiException If $fetchType specified isn't one of the allowed fetch modes in $defaultFetchType
 	*                               If fetch mode specification is violated
 	* @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	*/
-	public function fetch(string $fetchType = '', string $className = '') {
+	public function fetch(string $fetchType, string $className = 'stdClass', array $classParams = []) {
 		$stmtResult = $this->stmtResult;
 		$row = [];
 
 		if(!$fetchType) $fetchType = $this->defaultFetchType; //Go with default fetch mode if not specified
 
-		if(!in_array($fetchType, self::ALLOWED_FETCH_TYPES_BOTH)) { //Check if it is an allowed fetch type
+		if(!in_array($fetchType, self::ALLOWED_FETCH_TYPES_BOTH, true)) { //Check if it is an allowed fetch type
 			$allowedComma = implode("','", self::ALLOWED_FETCH_TYPES_BOTH);
 			throw new SimpleMySQLiException("The variable 'fetchType' must be '$allowedComma'. You entered '$fetchType'");
 		}
@@ -179,14 +180,17 @@ class SimpleMySQLi {
 			$row = $stmtResult->fetch_row();
 		} else if($fetchType === 'assoc') {
 			$row = $stmtResult->fetch_assoc();
-		} else if($fetchType === 'obj' && !$className) {
-			$row = $stmtResult->fetch_object();
-		} else if($fetchType === 'obj' && $className) {
-			$row = $stmtResult->fetch_object($className);
+		} else if($fetchType === 'obj') {
+			if($classParams) {
+				$row = $stmtResult->fetch_object($className, $classParams);
+			} else {
+				$row = $stmtResult->fetch_object($className);
+			}
 		} else if($fetchType === 'col') {
 			if($stmtResult->field_count !== 1) {
 				throw new SimpleMySQLiException("The fetch type: '$fetchType' must have exactly 1 column in query");
 			}
+			
 			$row = $stmtResult->fetch_row()[0];
 		}
 
@@ -203,12 +207,13 @@ class SimpleMySQLi {
 	*               'groupCol' - Group by common values in the 1st column into 1D subarray. Same as PDO::FETCH_GROUP | PDO::FETCH_COLUMN
 	*               'groupObj' - Group by common values in the first column into object subarrays. Same as PDO::FETCH_GROUP | PDO::FETCH_CLASS
 	* @param string $className (optional) Class name to fetch into if 'obj' $fetchType
+	* @param array $classParams (optional) Array of constructor parameters for class if 'obj' $fetchType
 	* @return array Full array of $fetchType specified; [] if no rows
 	* @throws SimpleMySQLiException If $fetchType specified isn't one of the allowed fetch modes in $defaultFetchType
 	*                               If fetch mode specification is violated
 	* @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	*/
-	public function fetchAll(string $fetchType = '', string $className = ''): array {
+	public function fetchAll(string $fetchType, string $className = 'stdClass', array $classParams = []): array {
 		$stmtResult = $this->stmtResult;
 		$arr = [];
 
@@ -216,7 +221,7 @@ class SimpleMySQLi {
 
 		$comboAllowedTypes = array_merge(self::ALLOWED_FETCH_TYPES_BOTH, self::ALLOWED_FETCH_TYPES_FETCH_ALL); //fetchAll() can take any fetch type
 
-		if(!in_array($fetchType, $comboAllowedTypes)) { //Check if it is an allowed fetch type
+		if(!in_array($fetchType, $comboAllowedTypes, true)) { //Check if it is an allowed fetch type
 			$allowedComma = implode("','", $comboAllowedTypes);
 			throw new SimpleMySQLiException("The variable 'fetchType' must be '$allowedComma'. You entered '$fetchType'");
 		}
@@ -231,10 +236,14 @@ class SimpleMySQLi {
 		} else if($fetchType === 'assoc') {
 			$arr = $stmtResult->fetch_all(MYSQLI_ASSOC);
 		} else if($fetchType === 'obj') {
-			if(!$className) $className = 'stdClass';
-			
-			while($row = $stmtResult->fetch_object($className)) {
-				$arr[] = $row;
+			if($classParams) {
+				while($row = $stmtResult->fetch_object($className, $classParams)) {
+					$arr[] = $row;
+				}
+			} else {
+				while($row = $stmtResult->fetch_object($className)) {
+					$arr[] = $row;
+				}
 			}
 		} else if($fetchType === 'col') {
 			if($stmtResult->field_count !== 1) {
@@ -268,6 +277,7 @@ class SimpleMySQLi {
 				while($row = $stmtResult->fetch_assoc()) {
 					$firstColVal = $row[$firstColName];
 					unset($row[$firstColName]);
+					
 					if($fetchType === 'keyPairArr') $arr[$firstColVal] = $row;
 					else if($fetchType === 'group') $arr[$firstColVal][] = $row;
 				}
@@ -287,7 +297,7 @@ class SimpleMySQLi {
 	 * @throws SimpleMySQLiException If there is a mismatch in parameter values, parameter types or SQL
 	 * @throws mysqli_sql_exception If transaction failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
-	public function multiQuery($sql, array $values, array $types = []): void {
+	public function atomicQuery($sql, array $values, array $types = []): void {
 		try {
 			$this->mysqli->autocommit(FALSE);
 

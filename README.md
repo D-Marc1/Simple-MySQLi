@@ -101,7 +101,7 @@ require 'simple-mysqli.php';
   - [insertId()](#insertid)
   - [fetch()](#fetch)
   - [fetchAll()](#fetchall)
-  - [multiQuery()](#multiquery)
+  - [atomicQuery()](#atomicquery)
   - [transaction()](#transaction)
   - [freeResult()](#freeresult)
   - [closeStmt()](#closestmt)
@@ -471,7 +471,7 @@ $sql[] = "INSERT INTO myTable (name, age) VALUES (?, ?)";
 $sql[] = "UPDATE myTable SET name = ? WHERE id = ?";
 $sql[] = "UPDATE myTable SET name = ? WHERE id = ?";
 $arrOfValues = [[$_POST['name'], $_POST['age']], ['Pablo', 34], [$_POST['name'], $_SESSION['id']]];
-$mysqli->multiQuery($sql, $arrOfValues);
+$mysqli->atomicQuery($sql, $arrOfValues);
 ```
 
 ### Same Template, Different Values
@@ -479,12 +479,12 @@ $mysqli->multiQuery($sql, $arrOfValues);
 ```php
 $sql = "INSERT INTO myTable (name, age) VALUES (?, ?)";
 $arrOfValues = [[$_POST['name'], $_POST['age']], ['Pablo', 34], [$_POST['name'], 22]];
-$mysqli->multiQuery($sql, $arrOfValues);
+$mysqli->atomicQuery($sql, $arrOfValues);
 ```
 
 ### Transactions with Callbacks
 
-The regular way of doing transactions in Simple MySQLi with `multiQuery()` is exceedingly concise and can be used in most cases. However, sometimes you might want a little more control. For instance, under the hood, it only checks if each query's `affectedRows()` is greater than one. This isn't suitable for a query like INSERT multiple or DELETE/UPDATE query that affects multiple rows. 
+The regular way of doing transactions in Simple MySQLi with `atomicQuery()` is exceedingly concise and can be used in most cases. However, sometimes you might want a little more control. For instance, under the hood, it only checks if each query's `affectedRows()` is greater than one. This isn't suitable for a query like INSERT multiple or DELETE/UPDATE query that affects multiple rows. 
 
 There's also no need to start the transaction, nor deal with rollbacks. If you want to rollback, simply throw an exception, and it'll rollback for you, while printing the exception solely in the error log. Execute allows you to efficiently reuse your prepared statement with different values.
 
@@ -726,7 +726,7 @@ Get the latest primary key inserted
 ## fetch()
 
 ```php
-function fetch(string $fetchType = '', string $className = '')
+function fetch(string $fetchType = '', string $className = '', array $classParams = [])
 ```
 
 **Description**
@@ -736,7 +736,8 @@ Fetch one row at a time
 **Parameters**
 
 - **string $fetchType = ''** (optional) - This overrides the default fetch type set in the constructor. Check [here](#constructor) for possible values
-- **string $className = ''** (optional) - Class name to fetch into if `obj` $fetchType
+- **string $className = ''** (optional) - Class name to fetch into if 'obj' $fetchType
+- **array $classParams = []** (optional) - Array of constructor parameters for class if 'obj' $fetchType
 
 **Returns**
 
@@ -769,7 +770,8 @@ Fetch all results in array
   - **'group'** - Group by common values in the 1st column into associative subarrays. Same as `PDO::FETCH_GROUP`
   - **'groupCol'** - Group by common values in the 1st column into 1D subarray. Same as `PDO::FETCH_GROUP | PDO::FETCH_COLUMN`
   - **'groupObj'** - Group by common values in the first column into object subarrays. Same as `PDO::FETCH_GROUP | PDO::FETCH_CLASS`
-- **string $className = ''** (optional) - Class name to fetch into if `obj` $fetchType
+- **string $className = ''** (optional) - Class name to fetch into if 'obj' $fetchType
+- **array $classParams = []** (optional) - Array of constructor parameters for class if 'obj' $fetchType
 
 **Returns**
 
@@ -783,10 +785,10 @@ Fetch all results in array
   - If fetch mode specification is violated
 - **mysqli_sql_exception** If any mysqli function failed due to `mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)`
 
-## multiQuery()
+## atomicQuery()
 
 ```php
-function multiQuery(array|string $sql, array $values, array $types = []): void
+function atomicQuery(array|string $sql, array $values, array $types = []): void
 ```
 
 **Description**
