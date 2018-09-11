@@ -45,7 +45,7 @@ require 'vendor/autoload.php';
 
 **Git**
 
-Clone either the latest version or by tag. 
+Clone either the latest version or by tag.
 
 ```
 //Get by version number
@@ -64,6 +64,7 @@ require 'simple-mysqli.php';
 # Table of Contents
 
 - [Examples](#examples)
+  - [Create a New MySQL Connection](#create-a-new-mysql-connection)
   - [Insert, Update, Delete](#insert-update-delete)
     - [Insert](#insert)
     - [Update](#update)
@@ -484,7 +485,7 @@ $mysqli->atomicQuery($sql, $arrOfValues);
 
 ### Transactions with Callbacks
 
-The regular way of doing transactions in Simple MySQLi with `atomicQuery()` is exceedingly concise and can be used in most cases. However, sometimes you might want a little more control. For instance, under the hood, it only checks if each query's `affectedRows()` is greater than one. This isn't suitable for a query like INSERT multiple or DELETE/UPDATE query that affects multiple rows. 
+The regular way of doing transactions in Simple MySQLi with `atomicQuery()` is exceedingly concise and can be used in most cases. However, sometimes you might want a little more control. For instance, under the hood, it only checks if each query's `affectedRows()` is greater than one. This isn't suitable for a query like INSERT multiple or DELETE/UPDATE query that affects multiple rows.
 
 There's also no need to start the transaction, nor deal with rollbacks. If you want to rollback, simply throw an exception, and it'll rollback for you, while printing the exception solely in the error log. Execute allows you to efficiently reuse your prepared statement with different values.
 
@@ -726,7 +727,7 @@ Get the latest primary key inserted
 ## fetch()
 
 ```php
-function fetch(string $fetchType = '', string $className = '', array $classParams = [])
+function fetch(string $fetchType = '', string $className = 'stdClass', array $classParams = [])
 ```
 
 **Description**
@@ -736,7 +737,7 @@ Fetch one row at a time
 **Parameters**
 
 - **string $fetchType = ''** (optional) - This overrides the default fetch type set in the constructor. Check [here](#constructor) for possible values
-- **string $className = ''** (optional) - Class name to fetch into if 'obj' $fetchType
+- **string $className = 'stdClass'** (optional) - Class name to fetch into if 'obj' $fetchType
 - **array $classParams = []** (optional) - Array of constructor parameters for class if 'obj' $fetchType
 
 **Returns**
@@ -755,7 +756,7 @@ Fetch one row at a time
 ## fetchAll()
 
 ```php
-function fetchAll(string $fetchType = '', string $className = ''): array
+function fetchAll(string $fetchType = '', string $className = 'stdClass'): array
 ```
 
 **Description**
@@ -770,7 +771,7 @@ Fetch all results in array
   - **'group'** - Group by common values in the 1st column into associative subarrays. Same as `PDO::FETCH_GROUP`
   - **'groupCol'** - Group by common values in the 1st column into 1D subarray. Same as `PDO::FETCH_GROUP | PDO::FETCH_COLUMN`
   - **'groupObj'** - Group by common values in the first column into object subarrays. Same as `PDO::FETCH_GROUP | PDO::FETCH_CLASS`
-- **string $className = ''** (optional) - Class name to fetch into if 'obj' $fetchType
+- **string $className = 'stdClass'** (optional) - Class name to fetch into if 'obj' $fetchType
 - **array $classParams = []** (optional) - Array of constructor parameters for class if 'obj' $fetchType
 
 **Returns**
@@ -827,12 +828,16 @@ Do stuff inside of transaction
 ## freeResult()
 
 ```php
-function freeResult(): void
+function freeResult(): self
 ```
 
 **Description**
 
 Frees MySQL result
+
+**Returns**
+
+`$this`
 
 **Throws**
 
@@ -841,12 +846,16 @@ Frees MySQL result
 ## closeStmt()
 
 ```php
-function closeStmt(): void
+function closeStmt(): self
 ```
 
 **Description**
 
 Closes MySQL prepared statement
+
+**Returns**
+
+`$this`
 
 **Throws**
 
@@ -860,7 +869,7 @@ function close(): void
 
 **Description**
 
-Closes the MySQL connection.
+Closes the MySQL connections
 
 **Throws**
 

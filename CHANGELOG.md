@@ -1,5 +1,11 @@
 # Changelog
 
+- [**1.5.4**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.5.4) - September 11, 2018
+
+  - Fix `fetch()` and `fetchAll()` `stdClass`' issue.
+  - Use `query()` instead of `prepared()` if non-prepared for efficiency
+  - Allow chaining for `freeResult()` and `closeStmt()`
+
 - [**1.5.3**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.5.3) - April 22, 2018
 
   - Add support for entering constructor parameters for fetching objects in a class
