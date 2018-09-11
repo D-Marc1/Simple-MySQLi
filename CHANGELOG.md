@@ -2,7 +2,7 @@
 
 - [**1.5.4**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.5.4) - September 11, 2018
 
-  - Fix `fetch()` and `fetchAll()` `stdClass`' issue.
+  - Fix `fetch()` and `fetchAll()` `stdClass` issue.
   - Use `query()` instead of `prepared()` if non-prepared for efficiency
   - Allow chaining for `freeResult()` and `closeStmt()`
 

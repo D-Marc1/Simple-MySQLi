@@ -513,6 +513,26 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
 });
 ```
 
+## Freeing and Closing
+
+Freeing the result and closing the prepared statement is very simple.
+
+```php
+$arr = $mysqli->query("SELECT id, name, age FROM events WHERE id <= ?", [4])->fetchAll("assoc");
+if(!$arr) exit('No rows');
+$mysqli->freeResult(); //Free result
+$mysqli->closeStmt(); //Close statement
+$mysqli->close(); //Close connection
+```
+
+You can even chain them.
+
+```php
+$arr = $mysqli->query("SELECT id, name, age FROM events WHERE id <= ?", [4])->fetchAll("assoc");
+if(!$arr) exit('No rows');
+$mysqli->freeResult()->closeStmt()->close();
+```
+
 **Try/Catch**
 
 ```php
