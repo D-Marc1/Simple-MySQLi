@@ -1,4 +1,9 @@
 # Changelog
+-[**1.5.5**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.5.5) - September 20, 2018
+
+  - Allow to use scalar for single value in `query()` and `execute()`
+  - Fix `prepared()` still used instead of `query()`
+  - Store new result with `execute()`
 
 - [**1.5.4**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.5.4) - September 11, 2018
 

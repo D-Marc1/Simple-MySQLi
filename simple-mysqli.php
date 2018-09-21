@@ -4,7 +4,7 @@ class SimpleMySQLiException extends Exception {}
 /**
  * Class SimpleMySQLi
  *
- * @version 1.5.4
+ * @version 1.5.5
  */
 class SimpleMySQLi {
 	private $mysqli;
@@ -52,22 +52,24 @@ class SimpleMySQLi {
 	 *`fetchAll()` for fetching all results
 	 *
 	 * @param string $sql SQL query
-	 * @param array $values (optional) Values or variables to bind to query. Can be empty for selecting all rows
+	 * @param array|string|int $values (optional) Values or variables to bind to query. Can be empty for selecting all rows
 	 * @param string $types (optional) Variable type for each bound value/variable
 	 * @return $this
 	 * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
-	public function query(string $sql, array $values = [], string $types = ''): self {
+	public function query(string $sql, $values = [], string $types = ''): self {
+		if(!is_array($values)) $values = [$values]; //Convert scalar to array
+
 		if(!$types) $types = str_repeat('s', count($values)); //String type for all variables if not specified
 
 		if(!$values) {
-			$this->stmtResult = $this->mysqli->query($sql);
+			$this->stmtResult = $this->mysqli->query($sql); //Use non-prepared query if no values to bind for efficiency
+		} else {
+			$stmt = $this->stmt = $this->mysqli->prepare($sql);
+			$stmt->bind_param($types, ...$values);
+			$stmt->execute();
+			$this->stmtResult = $stmt->get_result();
 		}
-
-		$stmt = $this->stmt = $this->mysqli->prepare($sql);
-		if($values) $stmt->bind_param($types, ...$values);
-		$stmt->execute();
-		$this->stmtResult = $stmt->get_result();
 
 		return $this;
 	}
@@ -80,12 +82,15 @@ class SimpleMySQLi {
 	 * @return $this
 	 * @throws mysqli_sql_exception If any mysqli function failed due to mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT)
 	 */
-	public function execute(array $values = [], string $types = ''): self {
+	public function execute($values = [], string $types = ''): self {
+		if(!is_array($values)) $values = [$values]; //Convert scalar to array
+
 		if(!$types) $types = str_repeat('s', count($values)); //String type for all variables if not specified
 
 		$stmt = $this->stmt;
 		$stmt->bind_param($types, ...$values);
 		$stmt->execute();
+		$this->stmtResult = $stmt->get_result();
 
 		return $this;
 	}

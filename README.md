@@ -90,6 +90,9 @@ require 'simple-mysqli.php';
   - [Transactions](#transactions)
     - [Same Template, Different Values](#same-template-different-values)
     - [Transactions with Callbacks](#transactions-with-callbacks)
+    - [Error Exception Handling](#error-exception-handling)
+      -[Gotcha with Exception Handling](#gotcha-with-exception-handling)
+    -[Freeing and Closing](#freeing-and-closing)
 - [Documentation](#documentation)
   - [Constructor](#constructor)
   - [query()](#query)
@@ -499,7 +502,7 @@ $mysqli->transaction(function($mysqli) {
 });
 ```
 
-## Error Handling
+## Error Exception Handling
 
 Either wrap all your queries with one `try/catch` or use the `set_exception_handler()` function to either redirect to a global error page or a separate one for each page. **Don't forget to take out echo in production**, as you obviously do not need the client to see this information.
 
@@ -586,7 +589,7 @@ new SimpleMySQLi(string $host, string $username, string $password, string $dbNam
 ## query()
 
 ```php
-function query(string $sql, array $values = [], string $types = ''): self
+function query(string $sql, array|string|int $values = [], string $types = ''): self
 ```
 
 **Description**
@@ -596,7 +599,7 @@ All queries go here. If select statement, needs to be used with either `fetch()`
 **Parameters**
 
 - **string $sql** - SQL query
-- **array $values = []** (optional) - values or variables to bind to query; can be empty for selecting all rows
+- **array|string|int $values = []** (optional) - values or variables to bind to query; can be empty for selecting all rows
 - **string $types = ''** (optional) - variable type for each bound value/variable
 
 **Returns**
