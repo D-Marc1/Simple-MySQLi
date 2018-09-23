@@ -1,8 +1,9 @@
 # Changelog
--[**1.5.5**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.5.5) - September 20, 2018
+
+- [**1.5.5**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.5.5) - September 20, 2018
 
   - Allow to use scalar for single value in `query()` and `execute()`
-  - Fix `prepared()` still used instead of `query()`
+  - Fix `prepare()` still used instead of `query()`
   - Store new result with `execute()`
 
 - [**1.5.4**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.5.4) - September 11, 2018
@@ -34,12 +35,12 @@
 
 - [**1.4.5**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.4.5) - March 28, 2018
 
-	- Remove `setRowsMatched()`, in favor of the new getter method `rowsMatched()`
+  - Remove `setRowsMatched()`, in favor of the new getter method `rowsMatched()`
 
 - [**1.4.4**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.4.4) - March 27, 2018
 
-	- Enforce return type declaration on methods when possible
-	- Switch to more consistent if style
+  - Enforce return type declaration on methods when possible
+  - Switch to more consistent if style
 
 - [**1.4.3**](https://github.com/WebsiteBeaver/Simple-MySQLi/tree/1.4.3) - March 25, 2018
 
